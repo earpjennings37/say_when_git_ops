@@ -1,0 +1,5 @@
+objstoreConfig:
+  name: thanos-objstore
+  key: objstore.yml
+
+replicaCount: 1

@@ -1,0 +1,5 @@
+replicaCount: 1
+
+stores:
+  - dnssrv+_grpc._tcp.thanos-store.monitoring.svc.cluster.local
+  - dnssrv+_grpc._tcp.prometheus-operated.monitoring.svc.cluster.local

@@ -5,6 +5,7 @@
 # Access Grafana 2 ways:
 # command line:kubectl port-forward svc/kube-prometheus-stack-grafana -n monitoring 3000:80 & then http://localhost:3000
 # in k9: svc, shift-f, :secrets, x 
+
 grafana:
   enabled: true
   adminPassword: "admin"
@@ -33,6 +34,17 @@ prometheus:
   prometheusSpec:
     # Minimal retention to reduce EBS cost
     retention: 24h
+    serviceAccountName: prometheus-kube-prometheus-prometheus
+    serviceAccountAnnotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::<YOUR-AWS-ACCOUNT-ID>:role/thanos-irsa-role
+
+    thanos:
+      image: "quay.io/thanos/thanos:v0.34.0"
+      objectStorageConfig:
+        name: thanos-objstore
+        key: objstore.yml
+
+        replicaCount: 1
 
     # Smallest safe storage volume
     storageSpec:

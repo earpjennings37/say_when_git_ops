@@ -1,0 +1,7 @@
+objstoreConfig:
+  name: thanos-objstore
+  key: objstore.yml
+
+retentionResolutionRaw: 30d
+retentionResolution5m: 180d
+retentionResolution1h: 365d
