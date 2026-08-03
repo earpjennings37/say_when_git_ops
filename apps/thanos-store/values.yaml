@@ -1,5 +1,47 @@
+replicaCount: 1
+
+service:
+  type: ClusterIP
+
 objstoreConfig:
   name: thanos-objstore
   key: objstore.yml
 
-replicaCount: 1
+serviceAccount:
+  create: true
+  name: thanos-storegateway
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::<YOUR-AWS-ACCOUNT-ID>:role/thanos-irsa-role
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    memory: 512Mi
+
+autoscaling:
+  enabled: false
+
+readinessProbe:
+  httpGet:
+    path: /-/ready
+    port: 10901
+  initialDelaySeconds: 10
+
+livenessProbe:
+  httpGet:
+    path: /-/healthy
+    port: 10901
+  initialDelaySeconds: 10
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+extraArgs:
+  block-sync-concurrency: 2
+  block-meta-fetch-concurrency: 2
+  block-sync-partial: true
+  index-cache-size: 256MB
+  store.grpc.series-max-concurrency: 2

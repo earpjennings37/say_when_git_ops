@@ -1,7 +1,64 @@
+replicaCount: 1
+
+service:
+  type: ClusterIP
+
 objstoreConfig:
   name: thanos-objstore
   key: objstore.yml
 
+serviceAccount:
+  create: true
+  name: thanos-compactor
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::<YOUR-AWS-ACCOUNT-ID>:role/thanos-irsa-role
+
+# Cheap-mode retention windows
 retentionResolutionRaw: 30d
 retentionResolution5m: 180d
 retentionResolution1h: 365d
+
+# Minimal safe resources
+resources:
+  requests:
+    cpu: 50m
+    memory: 256Mi
+  limits:
+    memory: 512Mi
+
+autoscaling:
+  enabled: false
+
+# Compactor stability probes
+readinessProbe:
+  httpGet:
+    path: /-/ready
+    port: 10902
+  initialDelaySeconds: 10
+
+livenessProbe:
+  httpGet:
+    path: /-/healthy
+    port: 10902
+  initialDelaySeconds: 10
+
+# Prevent eviction during node drains
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# Magic cheap-mode settings
+extraArgs:
+  # Reduce concurrency → reduce memory → reduce node autoscaling
+  compaction-concurrency: 1
+  downsampling-concurrency: 1
+
+  # Prevent huge memory spikes during compaction
+  block-sync-concurrency: 2
+  block-meta-fetch-concurrency: 2
+
+  # Avoid aggressive compaction on small clusters
+  disable-auto-compaction: false
+
+  # Reduce S3 hammering
+  consistency-delay: 30m

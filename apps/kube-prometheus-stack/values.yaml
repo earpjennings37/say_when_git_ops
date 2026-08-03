@@ -34,17 +34,17 @@ prometheus:
   prometheusSpec:
     # Minimal retention to reduce EBS cost
     retention: 24h
+    replicas: 1
+    walCompression: true
     serviceAccountName: prometheus-kube-prometheus-prometheus
     serviceAccountAnnotations:
       eks.amazonaws.com/role-arn: arn:aws:iam::<YOUR-AWS-ACCOUNT-ID>:role/thanos-irsa-role
 
     thanos:
-      image: "quay.io/thanos/thanos:v0.34.0"
+      image: "quay.io/thanos/thanos:v0.42.0"
       objectStorageConfig:
         name: thanos-objstore
         key: objstore.yml
-
-        replicaCount: 1
 
     # Smallest safe storage volume
     storageSpec:
@@ -61,7 +61,6 @@ prometheus:
         cpu: 100m
         memory: 200Mi
       limits:
-        cpu: 300m
         memory: 400Mi
 
 
@@ -70,7 +69,6 @@ prometheus:
 # ============================
 alertmanager:
   enabled: false
-
 
 # ============================
 # NODE EXPORTER (CHEAP MODE)
@@ -84,7 +82,6 @@ nodeExporter:
       cpu: 50m
       memory: 50Mi
 
-
 # ============================
 # KUBE STATE METRICS (CHEAP MODE)
 # ============================
@@ -96,7 +93,6 @@ kubeStateMetrics:
     limits:
       cpu: 100m
       memory: 100Mi
-
 
 # ============================
 # PROMETHEUS OPERATOR (CHEAP MODE)

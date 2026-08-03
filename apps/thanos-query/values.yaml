@@ -1,5 +1,46 @@
+service:
+  type: ClusterIP
+
 replicaCount: 1
 
 stores:
   - dnssrv+_grpc._tcp.thanos-store.monitoring.svc.cluster.local
   - dnssrv+_grpc._tcp.prometheus-operated.monitoring.svc.cluster.local
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+readinessProbe:
+  httpGet:
+    path: /-/ready
+    port: 10902
+  initialDelaySeconds: 10
+
+livenessProbe:
+  httpGet:
+    path: /-/healthy
+    port: 10902
+  initialDelaySeconds: 10
+
+topologySpreadConstraints:
+  - maxSkew: 1
+    topologyKey: kubernetes.io/hostname
+    whenUnsatisfiable: DoNotSchedule
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: thanos-query
+
+nodeSelector:
+  kubernetes.io/arch: arm64
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 100Mi
+  limits:
+    memory: 200Mi
+
+# Optional but recommended for stability
+autoscaling:
+  enabled: false
