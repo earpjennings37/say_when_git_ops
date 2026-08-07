@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/earpjennings37/git_ops.git
     targetRevision: main
-    path: apps
+    path: apps/root
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
