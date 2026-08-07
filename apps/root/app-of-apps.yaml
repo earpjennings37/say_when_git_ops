@@ -8,8 +8,7 @@ spec:
     - directory:
         path: apps
         recurse: true
-        exclude:
-          - apps/root
+
   template:
     metadata:
       name: '{{path.basename}}'
