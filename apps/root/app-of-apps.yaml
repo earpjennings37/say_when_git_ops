@@ -5,9 +5,11 @@ metadata:
   namespace: argocd
 spec:
   generators:
-    - directory:
-        path: apps
-        recurse: true
+    - git:
+        repoURL: https://github.com/earpjennings37/say_when_git_ops.git
+        revision: main
+        directories:
+          - path: apps/*
 
   template:
     metadata:
