@@ -9,8 +9,9 @@ spec:
         repoURL: https://github.com/earpjennings37/say_when_git_ops.git
         revision: main
         directory:
-          - recurse: true
-          - path: apps/*
+          recurse: true
+          path: apps
+
   template:
     metadata:
       name: '{{path.basename}}'
