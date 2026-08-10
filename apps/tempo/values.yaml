@@ -1,21 +1,42 @@
 tempo:
   auth_enabled: false
 
-replicas: 1
+  # Run Tempo in single-binary mode (one pod only)
+  singleBinary:
+    replicas: 1
 
-service:
-  type: ClusterIP
+  # Disable microservices mode
+  distributor:
+    enabled: false
 
-resources:
-  requests:
-    cpu: 50m
-    memory: 100Mi
-  limits:
-    cpu: 200m
-    memory: 200Mi
+  ingester:
+    enabled: false
 
-storage:
-  trace:
-    backend: local
-    local:
-      path: /var/tempo/traces
+  querier:
+    enabled: false
+
+  queryFrontend:
+    enabled: false
+
+  compactor:
+    enabled: false
+
+  gateway:
+    enabled: false
+
+  service:
+    type: ClusterIP
+
+  resources:
+    requests:
+      cpu: 20m
+      memory: 100Mi
+    limits:
+      cpu: 100m
+      memory: 200Mi
+
+  storage:
+    trace:
+      backend: local
+      local:
+        path: /var/tempo/traces

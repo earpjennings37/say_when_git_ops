@@ -17,10 +17,10 @@ grafana:
   # Reduce resource usage
   resources:
     requests:
-      cpu: 50m
+      cpu: 20m
       memory: 100Mi
     limits:
-      cpu: 200m
+      cpu: 100m
       memory: 200Mi
 
 
@@ -34,17 +34,19 @@ prometheus:
   prometheusSpec:
     # Minimal retention to reduce EBS cost
     retention: 24h
+    retenetionSize: 1GB
     replicas: 1
     walCompression: true
     serviceAccountName: prometheus-kube-prometheus-prometheus
     serviceAccountAnnotations:
       eks.amazonaws.com/role-arn: arn:aws:iam::<YOUR-AWS-ACCOUNT-ID>:role/thanos-irsa-role
 
-    thanos:
-      image: "quay.io/thanos/thanos:v0.42.0"
-      objectStorageConfig:
-        name: thanos-objstore
-        key: objstore.yml
+    thanos: null
+    # thanos:
+      # image: "quay.io/thanos/thanos:v0.42.0"
+      # objectStorageConfig:
+        # name: thanos-objstore
+        # key: objstore.yml
 
     # Smallest safe storage volume
     storageSpec:
@@ -53,12 +55,12 @@ prometheus:
           accessModes: ["ReadWriteOnce"]
           resources:
             requests:
-              storage: 5Gi
+              storage: 2Gi
 
     # Reduce CPU/memory footprint
     resources:
       requests:
-        cpu: 100m
+        cpu: 50m
         memory: 200Mi
       limits:
         memory: 400Mi
@@ -88,10 +90,10 @@ nodeExporter:
 kubeStateMetrics:
   resources:
     requests:
-      cpu: 20m
+      cpu: 10m
       memory: 50Mi
     limits:
-      cpu: 100m
+      cpu: 50m
       memory: 100Mi
 
 # ============================

@@ -1,31 +1,33 @@
 loki:
   auth_enabled: false
 
-singleBinary:
-  replicas: 1
+  # Run Loki in single-binary mode (one pod only)
+  singleBinary:
+    replicas: 1
 
-ingester:
-  replicas: 1
+  # Disable microservices mode
+  ingester:
+    enabled: false
 
-querier:
-  replicas: 1
+  querier:
+    enabled: false
 
-queryFrontend:
-  replicas: 1
+  queryFrontend:
+    enabled: false
 
-gateway:
-  enabled: false
+  gateway:
+    enabled: false
 
-service:
-  type: ClusterIP
+  service:
+    type: ClusterIP
 
-resources:
-  requests:
-    cpu: 50m
-    memory: 100Mi
-  limits:
-    cpu: 200m
-    memory: 200Mi
+  resources:
+    requests:
+      cpu: 20m
+      memory: 100Mi
+    limits:
+      cpu: 100m
+      memory: 200Mi
 
-storage:
-  type: filesystem
+  storage:
+    type: filesystem
