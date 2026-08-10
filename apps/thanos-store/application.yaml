@@ -2,18 +2,16 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: thanos-store
+  namespace: argocd
 spec:
   project: default
   source:
-    repoURL: https://charts.bitnami.com/bitnami
-    chart: thanos
-    targetRevision: 12.0.0
-    helm:
-      valuesFiles:
-        - values.yaml
+    repoURL: https://github.com/earpjennings37/say_when_git_ops.git
+    targetRevision: main
+    path: apps/thanos-store
   destination:
     server: https://kubernetes.default.svc
-    namespace: thanos-store
+    namespace: thanos
   syncPolicy:
     automated:
       prune: true
