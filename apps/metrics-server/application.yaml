@@ -11,6 +11,8 @@ spec:
     helm:
       valuesFiles:
         - values.yaml
+    directory:
+      recurse: true
   destination:
     server: https://kubernetes.default.svc
     namespace: kube-system
