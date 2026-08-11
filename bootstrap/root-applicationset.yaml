@@ -26,3 +26,24 @@ spec:
         automated:
           prune: true
           selfHeal: true
+      ignoreDifferences:
+        - group: monitoring.coreos.com
+          kind: ServiceMonitor
+          jsonPointers:
+            - /spec/endpoints
+        - group: monitoring.coreos.com
+          kind: PodMonitor
+          jsonPointers:
+            - /spec/podMetricsEndpoints
+        - group: monitoring.coreos.com
+          kind: PrometheusRule
+          jsonPointers:
+            - /spec
+        - group: apps
+          kind: Deployment
+          jsonPointers:
+            - /spec/template/metadata/annotations
+        - group: apps
+          kind: StatefulSet
+          jsonPointers:
+            - /spec/template/metadata/annotations
