@@ -1,17 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: argocd
+  name: argocd-bootstrap
   namespace: argocd
 spec:
   project: default
   source:
-    repoURL: https://github.com/earpjennings37/say_when_git_ops
-    targetRevision: main
-    path: apps/argocd
+    repoURL: https://argoproj.github.io/argo-helm
+    chart: argo-cd
+    targetRevision: "7.1.0"
     helm:
       valueFiles:
-        - values.yaml
+        - ../../apps/argocd/values.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
