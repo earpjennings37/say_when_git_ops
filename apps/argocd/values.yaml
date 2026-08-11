@@ -1,13 +1,19 @@
-server:
-  resources:
-    requests:
-      cpu: 20m
-      memory: 50Mi
-    limits:
-      cpu: 100m
-      memory: 100Mi
+configs:
+  params:
+    server.insecure: true
+  cm:
+    applicationSet:
+      enableNewGenerators: "true"
+  secret:
+    server.secretkey: "<hex-key>"
 
-repoServer:
+server:
+  enabled: true
+  insecure: true
+  service:
+    type: ClusterIP
+    ports:
+      http: 80
   resources:
     requests:
       cpu: 20m
@@ -17,15 +23,30 @@ repoServer:
       memory: 100Mi
 
 controller:
+  replicas: 1
   resources:
     requests:
-      cpu: 20m
-      memory: 50Mi
-    limits:
       cpu: 100m
-      memory: 100Mi
+      memory: 512Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
+
+repoServer:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      cpu: 300m
+      memory: 1Gi
+
+installCRDs: true
 
 applicationSet:
+  enabled: true
+  replicas: 1
   resources:
     requests:
       cpu: 10m
@@ -35,24 +56,10 @@ applicationSet:
       memory: 50Mi
 
 dex:
-  resources:
-    requests:
-      cpu: 10m
-      memory: 30Mi
-    limits:
-      cpu: 50m
-      memory: 50Mi
-
-notifications:
-  resources:
-    requests:
-      cpu: 10m
-      memory: 30Mi
-    limits:
-      cpu: 50m
-      memory: 50Mi
+  enabled: false
 
 redis:
+  enabled: true
   resources:
     requests:
       cpu: 10m
@@ -60,3 +67,5 @@ redis:
     limits:
       cpu: 50m
       memory: 50Mi
+
+additionalProjects: []
