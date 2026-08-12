@@ -1,0 +1,33 @@
+server:
+  service:
+    type: ClusterIP
+  ingress:
+    enabled: false
+
+controller:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+repoServer:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+applicationSet:
+  enabled: true
+
+redis:
+  enabled: true
+
+configs:
+  cm:
+    application.instanceLabelKey: argocd.argoproj.io/instance
