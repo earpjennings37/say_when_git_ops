@@ -6,15 +6,16 @@ metadata:
 spec:
   generators:
     - git:
-      repoURL: https://github.com/earpjennings37/say_when_git_ops.git
-      revision: main
-      directories:
-        - path: apps/*
-          exclude:
-            - apps/argocd
+        repoURL: https://github.com/earpjennings37/say_when_git_ops.git
+        revision: main
+        directories:
+          - path: apps/*
+            exclude:
+              - apps/argocd
   template:
     metadata:
       name: '{{path.basename}}'
+      namespace: argocd
     spec:
       project: default
       source:
@@ -23,29 +24,20 @@ spec:
         path: '{{path}}'
       destination:
         server: https://kubernetes.default.svc
-        namespace: argocd
+        namespace: monitoring
       syncPolicy:
         automated:
           prune: true
           selfHeal: true
-      ignoreDifferences:
-        - group: monitoring.coreos.com
-          kind: ServiceMonitor
-          jsonPointers:
-            - /spec/endpoints
-        - group: monitoring.coreos.com
-          kind: PodMonitor
-          jsonPointers:
-            - /spec/podMetricsEndpoints
-        - group: monitoring.coreos.com
-          kind: PrometheusRule
-          jsonPointers:
-            - /spec
-        - group: apps
-          kind: Deployment
-          jsonPointers:
-            - /spec/template/metadata/annotations
-        - group: apps
-          kind: StatefulSet
-          jsonPointers:
-            - /spec/template/metadata/annotations
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true
+          - RespectIgnoreDifferences=true
+        ignoreDifferences:
+          - group: "*"
+            kind: "*"
+            jsonPointers:
+              - /metadata/annotations
+              - /metadata/labels
+              - /spec/template/metadata/annotations
+              - /spec/template/metadata/labels
