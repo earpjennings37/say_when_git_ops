@@ -6,12 +6,12 @@ metadata:
 spec:
   generators:
     - git:
-      repoURL: https://github.com/earpjennings37/say_when_git_ops.git
-      revision: main
-      directories:
-        - path: apps/*
-          exclude:
-            - apps/argocd
+        repoURL: https://github.com/earpjennings37/say_when_git_ops.git
+        revision: main
+        directories:
+          - path: apps/*
+            ignore:
+              - apps/argocd
   template:
     metadata:
       name: '{{path.basename}}'
@@ -21,7 +21,7 @@ spec:
       source:
         repoURL: https://github.com/earpjennings37/say_when_git_ops.git
         targetRevision: main
-        path: '{{path}}'        # ✔ FIXED — MATCHES BOOTSTRAP
+        path: '{{path}}'
       destination:
         server: https://kubernetes.default.svc
         namespace: '{{path.basename}}'
