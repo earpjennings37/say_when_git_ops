@@ -6,11 +6,11 @@ metadata:
 spec:
   generators:
     - git:
-        repoURL: https://github.com/earpjennings37/say_when_git_ops.git
-        revision: main
-        directories:
-          - path: apps/*
-            exclude:
+      repoURL: https://github.com/earpjennings37/say_when_git_ops.git
+      revision: main
+      directories:
+        - path: apps/*
+          exclude:
             - apps/argocd
   template:
     metadata:
