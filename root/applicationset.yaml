@@ -10,6 +10,8 @@ spec:
         revision: main
         directories:
           - path: apps/*
+            exclude:
+              - apps/argocd
   template:
     metadata:
       name: '{{path.basename}}'
