@@ -1,7 +1,8 @@
 server:
   service:
     type: ClusterIP
-    serviceport: 8080
+    servicePortHttp: 8080
+    servicePortHttps: 8443
   ingress:
     enabled: false
 
