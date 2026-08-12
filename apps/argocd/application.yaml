@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/earpjennings37/say_when_git_ops.git
-    targetRevision: main
+    targetRevision: 7.3.6
     path: apps/argocd
     directory:
       recurse: true
