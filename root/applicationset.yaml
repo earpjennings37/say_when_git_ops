@@ -19,7 +19,7 @@ spec:
       source:
         repoURL: https://github.com/earpjennings37/say_when_git_ops.git
         targetRevision: main
-        path: 'apps/{{path.basename}}'
+        path: '{{path}}'        # ✔ FIXED — MATCHES BOOTSTRAP
       destination:
         server: https://kubernetes.default.svc
         namespace: '{{path.basename}}'
