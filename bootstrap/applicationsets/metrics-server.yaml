@@ -8,8 +8,8 @@ spec:
     - git:
         repoURL: https://github.com/earpjennings37/say_when_git_ops.git
         revision: main
-        files:
-          - path: apps/metrics-server/application.yaml
+        directories:
+          - path: apps/metrics-server
 
   template:
     metadata:
@@ -20,8 +20,12 @@ spec:
       project: default
 
       source:
-        repoURL: https://github.com/earpjennings37/say_when_git_ops.git
-        path: apps/metrics-server
+        repoURL: https://github.com/kubernetes-sigs/metrics-server.git
+        chart: metrics-server
+        targetRevision: 3.12.0
+        helm:
+          valuesFiles:
+            - values.yaml
 
       destination:
         server: https://kubernetes.default.svc

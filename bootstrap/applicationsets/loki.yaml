@@ -8,8 +8,8 @@ spec:
     - git:
         repoURL: https://github.com/earpjennings37/say_when_git_ops.git
         revision: main
-        files:
-          - path: apps/loki/application.yaml
+        directories:
+          - path: apps/loki
 
   template:
     metadata:
@@ -20,8 +20,13 @@ spec:
       project: default
 
       source:
-        repoURL: https://github.com/earpjennings37/say_when_git_ops.git
-        path: apps/loki
+        repoURL: https://github.com/grafana/helm-charts.git
+        chart: loki
+        targetRevision: 6.6.2
+        helm:
+          valuesFiles:
+            - values.yaml
+            - loki.yaml
 
       destination:
         server: https://kubernetes.default.svc

@@ -8,22 +8,27 @@ spec:
     - git:
         repoURL: https://github.com/earpjennings37/say_when_git_ops.git
         revision: main
-        files:
-          - path: apps/thanos-store/application.yaml
-          - path: apps/thanos-query/application.yaml
-          - path: apps/thanos-compactor/application.yaml
+        directories:
+          - path: apps/thanos-store
+          - path: apps/thanos-query
+          - path: apps/thanos-compactor
 
   template:
     metadata:
-      name: '{{metadata.name}}'
+      name: '{{path.basename}}'
       namespace: argocd
 
     spec:
       project: default
 
       source:
-        repoURL: https://github.com/earpjennings37/say_when_git_ops.git
-        path: apps/{{metadata.name}}
+        repoURL: https://github.com/bitnami/charts.git
+        chart: thanos
+        targetRevision: 12.3.0
+        helm:
+          valuesFiles:
+            - values.yaml
+            - '{{path.basename}}.yaml'
 
       destination:
         server: https://kubernetes.default.svc

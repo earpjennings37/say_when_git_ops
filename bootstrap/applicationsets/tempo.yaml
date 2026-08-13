@@ -8,8 +8,8 @@ spec:
     - git:
         repoURL: https://github.com/earpjennings37/say_when_git_ops.git
         revision: main
-        files:
-          - path: apps/tempo/application.yaml
+        directories:
+          - path: apps/tempo
 
   template:
     metadata:
@@ -20,8 +20,13 @@ spec:
       project: default
 
       source:
-        repoURL: https://github.com/earpjennings37/say_when_git_ops.git
-        path: apps/tempo
+        repoURL: https://github.com/grafana/helm-charts.git
+        chart: tempo
+        targetRevision: 1.7.0
+        helm:
+          valuesFiles:
+            - values.yaml
+            - tempo.yaml
 
       destination:
         server: https://kubernetes.default.svc

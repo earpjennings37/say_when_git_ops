@@ -8,8 +8,8 @@ spec:
     - git:
         repoURL: https://github.com/earpjennings37/say_when_git_ops.git
         revision: main
-        files:
-          - path: apps/kube-prometheus-stack/application.yaml
+        directories:
+          - path: apps/kube-prometheus-stack
 
   template:
     metadata:
@@ -20,8 +20,14 @@ spec:
       project: default
 
       source:
-        repoURL: https://github.com/earpjennings37/say_when_git_ops.git
-        path: apps/kube-prometheus-stack
+        repoURL: https://github.com/prometheus-community/helm-charts.git
+        chart: kube-prometheus-stack
+        targetRevision: 58.2.2
+        helm:
+          valuesFiles:
+            - values.yaml
+            - monitoring.yaml
+            - objstore.yaml
 
       destination:
         server: https://kubernetes.default.svc
