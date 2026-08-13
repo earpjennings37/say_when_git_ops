@@ -19,15 +19,9 @@ spec:
     spec:
       project: default
 
-      source:
-        repoURL: '{{source.repoURL}}'
-        chart: '{{source.chart}}'
-        targetRevision: '{{source.targetRevision}}'
-        helm: '{{source.helm}}'
+      source: '{{source}}'
 
-      destination:
-        server: '{{destination.server}}'
-        namespace: '{{destination.namespace}}'
+      destination: '{{destination}}'
 
       syncPolicy:
         automated:
