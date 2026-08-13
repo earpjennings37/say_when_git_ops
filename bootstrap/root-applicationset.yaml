@@ -19,16 +19,11 @@ spec:
     spec:
       project: default
 
-      source:
-        repoURL: '{{source.repoURL}}'
-        chart: '{{source.chart}}'
-        targetRevision: '{{source.targetRevision}}'
-        helm:
-          valuesFiles: {{source.helm.valuesFiles}}
+      # Copy the entire source block from the child YAML
+      source: '{{source}}'
 
-      destination:
-        server: '{{destination.server}}'
-        namespace: '{{destination.namespace}}'
+      # Copy the entire destination block from the child YAML
+      destination: '{{destination}}'
 
       syncPolicy:
         automated:
