@@ -1,14 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: thanos-compactor
+  name: thanos
   namespace: argocd
 spec:
   project: default
   source:
-    repoURL: https://github.com/earpjennings37/say_when_git_ops.git
-    targetRevision: main
-    path: apps/thanos-compactor
+    repoURL: https://github.com/thanos-io/thanos.git
+    chart: thanos
+    targetRevision: 0.34.0
+    helm:
+      valueFiles:
+        - apps/thanos/values.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring

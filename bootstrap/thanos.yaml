@@ -9,20 +9,18 @@ spec:
         repoURL: https://github.com/earpjennings37/say_when_git_ops.git
         revision: main
         files:
-          - path: apps/thanos-compactor/application.yaml
-          - path: apps/thanos-query/application.yaml
-          - path: apps/thanos-store/application.yaml
+          - path: apps/thanos/application.yaml
 
   template:
     metadata:
-      name: '{{path.basename}}'
+      name: thanos
       namespace: argocd
     spec:
       project: default
       source:
         repoURL: https://github.com/earpjennings37/say_when_git_ops.git
-        path: apps/{{path.basename}}
         targetRevision: main
+        path: apps/thanos
       destination:
         server: https://kubernetes.default.svc
         namespace: monitoring
