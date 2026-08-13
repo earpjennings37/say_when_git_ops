@@ -1,4 +1,4 @@
-apiVersion: argocd.io/v1alpha1
+apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
   name: tempo
@@ -18,20 +18,9 @@ spec:
 
     spec:
       project: default
-
-      source:
-        repoURL: https://github.com/grafana/helm-charts.git
-        chart: tempo
-        targetRevision: 1.7.0
-        helm:
-          valuesFiles:
-            - values.yaml
-            - tempo.yaml
-
       destination:
         server: https://kubernetes.default.svc
         namespace: tempo
-
       syncPolicy:
         automated:
           prune: true

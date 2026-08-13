@@ -1,4 +1,4 @@
-apiVersion: argocd.io/v1alpha1
+apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
   name: monitoring
@@ -18,21 +18,9 @@ spec:
 
     spec:
       project: default
-
-      source:
-        repoURL: https://github.com/prometheus-community/helm-charts.git
-        chart: kube-prometheus-stack
-        targetRevision: 58.2.2
-        helm:
-          valuesFiles:
-            - values.yaml
-            - monitoring.yaml
-            - objstore.yaml
-
       destination:
         server: https://kubernetes.default.svc
         namespace: monitoring
-
       syncPolicy:
         automated:
           prune: true

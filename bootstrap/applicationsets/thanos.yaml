@@ -1,4 +1,4 @@
-apiVersion: argocd.io/v1alpha1
+apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
   name: thanos
@@ -20,20 +20,9 @@ spec:
 
     spec:
       project: default
-
-      source:
-        repoURL: https://github.com/bitnami/charts.git
-        chart: thanos
-        targetRevision: 12.3.0
-        helm:
-          valuesFiles:
-            - values.yaml
-            - '{{path.basename}}.yaml'
-
       destination:
         server: https://kubernetes.default.svc
         namespace: thanos
-
       syncPolicy:
         automated:
           prune: true

@@ -18,20 +18,9 @@ spec:
 
     spec:
       project: default
-
-      source:
-        repoURL: https://github.com/grafana/helm-charts.git
-        chart: loki
-        targetRevision: 6.6.2
-        helm:
-          valuesFiles:
-            - values.yaml
-            - loki.yaml
-
       destination:
         server: https://kubernetes.default.svc
         namespace: loki
-
       syncPolicy:
         automated:
           prune: true
