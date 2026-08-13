@@ -19,10 +19,11 @@ spec:
       project: default
       source:
         repoURL: https://github.com/earpjennings37/say_when_git_ops.git
-        path: apps/metrics-server
+        path: '{{path.dir}}'
+        targetRevision: main
       destination:
         server: https://kubernetes.default.svc
-        namespace: kube-system
+        namespace: metrics-server
       syncPolicy:
         automated:
           prune: true

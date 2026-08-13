@@ -21,7 +21,8 @@ spec:
       project: default
       source:
         repoURL: https://github.com/earpjennings37/say_when_git_ops.git
-        path: apps/thanos-store
+        path: '{{path.dir}}'          # ⭐ dynamic path
+        targetRevision: main          # ⭐ required
       destination:
         server: https://kubernetes.default.svc
         namespace: thanos
