@@ -2,18 +2,23 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: loki
+  namespace: argocd
 spec:
   project: default
+
   source:
-    repoURL: https://grafana.github.io/helm-charts
+    repoURL: https://github.com/earpjennings37/say_when_git_ops.git
     chart: loki
     targetRevision: 6.6.2
     helm:
       valuesFiles:
         - values.yaml
+        - loki.yaml
+
   destination:
     server: https://kubernetes.default.svc
     namespace: loki
+
   syncPolicy:
     automated:
       prune: true

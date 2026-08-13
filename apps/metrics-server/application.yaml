@@ -2,18 +2,22 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: metrics-server
+  namespace: argocd
 spec:
   project: default
+
   source:
-    repoURL: https://kubernetes-sigs.github.io/metrics-server/
+    repoURL: https://github.com/earpjennings37/say_when_git_ops.git
     chart: metrics-server
     targetRevision: 3.12.0
     helm:
       valuesFiles:
         - values.yaml
+
   destination:
     server: https://kubernetes.default.svc
     namespace: kube-system
+
   syncPolicy:
     automated:
       prune: true
