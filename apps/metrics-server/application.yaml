@@ -5,19 +5,13 @@ metadata:
   namespace: argocd
 spec:
   project: default
-
   source:
-    repoURL: https://github.com/kubernetes-sigs/metrics-server.git
-    chart: metrics-server
-    targetRevision: 3.12.0
-    helm:
-      valuesFiles:
-        - values.yaml
-
+    repoURL: https://github.com/earpjennings37/say_when_git_ops.git
+    targetRevision: main
+    path: apps/metrics-server
   destination:
     server: https://kubernetes.default.svc
-    namespace: kube-system
-
+    namespace: monitoring
   syncPolicy:
     automated:
       prune: true
