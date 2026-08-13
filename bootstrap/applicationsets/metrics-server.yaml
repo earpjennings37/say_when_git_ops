@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: root
+  name: metrics-server
   namespace: argocd
 spec:
   generators:
@@ -9,19 +9,23 @@ spec:
         repoURL: https://github.com/earpjennings37/say_when_git_ops.git
         revision: main
         files:
-          - path: apps/*/application.yaml
+          - path: apps/metrics-server/application.yaml
 
   template:
     metadata:
-      name: '{{metadata.name}}'
+      name: metrics-server
       namespace: argocd
 
     spec:
       project: default
 
+      source:
+        repoURL: https://github.com/earpjennings37/say_when_git_ops.git
+        path: apps/metrics-server
+
       destination:
         server: https://kubernetes.default.svc
-        namespace: monitoring
+        namespace: kube-system
 
       syncPolicy:
         automated:

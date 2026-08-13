@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: monitoring
+  namespace: argocd
+spec:
+  generators:
+    - git:
+        repoURL: https://github.com/earpjennings37/say_when_git_ops.git
+        revision: main
+        files:
+          - path: apps/kube-prometheus-stack/application.yaml
+
+  template:
+    metadata:
+      name: kube-prometheus-stack
+      namespace: argocd
+
+    spec:
+      project: default
+
+      source:
+        repoURL: https://github.com/earpjennings37/say_when_git_ops.git
+        path: apps/kube-prometheus-stack
+
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: monitoring
+
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true

@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: tempo
+  namespace: argocd
+spec:
+  generators:
+    - git:
+        repoURL: https://github.com/earpjennings37/say_when_git_ops.git
+        revision: main
+        files:
+          - path: apps/tempo/application.yaml
+
+  template:
+    metadata:
+      name: tempo
+      namespace: argocd
+
+    spec:
+      project: default
+
+      source:
+        repoURL: https://github.com/earpjennings37/say_when_git_ops.git
+        path: apps/tempo
+
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: tempo
+
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
