@@ -23,8 +23,7 @@ spec:
         repoURL: '{{source.repoURL}}'
         chart: '{{source.chart}}'
         targetRevision: '{{source.targetRevision}}'
-        helm:
-          valuesFiles: '{{source.helm.valuesFiles}}'
+        helm: '{{source.helm}}'
 
       destination:
         server: '{{destination.server}}'
