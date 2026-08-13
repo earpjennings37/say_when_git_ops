@@ -8,20 +8,24 @@ spec:
     - git:
         repoURL: https://github.com/earpjennings37/say_when_git_ops.git
         revision: main
-        files:
-          - path: apps/*/application.yaml
+        directories:
+          - path: apps/*
 
   template:
     metadata:
-      name: '{{metadata.name}}'
+      name: '{{path.basename}}'
       namespace: argocd
 
     spec:
       project: default
+      source:
+        repoURL: https://github.com/earpjennings37/say_when_git_ops.git
+        targetRevision: main
+        path: '{{path}}'
 
-      source: '{{source}}'
-
-      destination: '{{destination}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{path.basename}}'
 
       syncPolicy:
         automated:
