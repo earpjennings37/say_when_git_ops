@@ -17,12 +17,13 @@ spec:
     spec:
       project: default
       source:
-        repoURL: '{{repoURL}}'
-        targetRevision: '{{revision}}'
+        # Use the repoURL and targetRevision from the application.yaml file
+        repoURL: https://github.com/earpjennings37/say_when_git_ops.git
+        targetRevision: main
         path: '{{path}}'
       destination:
+        # Do NOT override namespace — let application.yaml decide
         server: https://kubernetes.default.svc
-        namespace: '{{path.basename}}'
       syncPolicy:
         automated:
           prune: true
