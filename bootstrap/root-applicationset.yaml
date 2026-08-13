@@ -18,6 +18,12 @@ spec:
 
     spec:
       project: default
+
+      # REQUIRED by your CRD
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: monitoring
+
       syncPolicy:
         automated:
           prune: true
