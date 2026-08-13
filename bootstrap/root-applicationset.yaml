@@ -18,13 +18,6 @@ spec:
 
     spec:
       project: default
-
-      # Copy the entire source block from the child YAML
-      source: '{{source}}'
-
-      # Copy the entire destination block from the child YAML
-      destination: '{{destination}}'
-
       syncPolicy:
         automated:
           prune: true
