@@ -7,7 +7,7 @@ spec:
   project: default
 
   source:
-    repoURL: https://github.com/earpjennings37/say_when_git_ops.git
+    repoURL: https://github.com/grafana/helm-charts.git
     chart: loki
     targetRevision: 6.6.2
     helm:
