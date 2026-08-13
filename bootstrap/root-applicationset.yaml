@@ -18,20 +18,6 @@ spec:
 
     spec:
       project: default
-
-      source:
-        repoURL: '{{source.repoURL}}'
-        chart: '{{source.chart}}'
-        targetRevision: '{{source.targetRevision}}'
-        helm:
-          valuesFiles:
-            - values.yaml
-            - objstore.yaml
-
-      destination:
-        server: '{{destination.server}}'
-        namespace: '{{destination.namespace}}'
-
       syncPolicy:
         automated:
           prune: true
