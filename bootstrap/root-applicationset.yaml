@@ -8,9 +8,8 @@ spec:
     - git:
         repoURL: https://github.com/earpjennings37/say_when_git_ops.git
         revision: main
-        directories:
-          - path: apps/*
-            exclude: false
+        files:
+          - path: apps/*/application.yaml
   template:
     metadata:
       name: '{{path.basename}}'
@@ -18,8 +17,8 @@ spec:
     spec:
       project: default
       source:
-        repoURL: https://github.com/earpjennings37/say_when_git_ops.git
-        targetRevision: main
+        repoURL: '{{repoURL}}'
+        targetRevision: '{{revision}}'
         path: '{{path}}'
       destination:
         server: https://kubernetes.default.svc
