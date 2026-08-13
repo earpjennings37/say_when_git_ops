@@ -19,11 +19,11 @@ spec:
       project: default
       source:
         repoURL: https://github.com/earpjennings37/say_when_git_ops.git
-        path: '{{path.dir}}'
+        path: apps/loki
         targetRevision: main
       destination:
         server: https://kubernetes.default.svc
-        namespace: loki
+        namespace: monitoring
       syncPolicy:
         automated:
           prune: true

@@ -19,7 +19,7 @@ spec:
       project: default
       source:
         repoURL: https://github.com/earpjennings37/say_when_git_ops.git
-        path: '{{path.dir}}'
+        path: apps/kube-prometheus-stack
         targetRevision: main
       destination:
         server: https://kubernetes.default.svc

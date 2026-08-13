@@ -9,9 +9,9 @@ spec:
         repoURL: https://github.com/earpjennings37/say_when_git_ops.git
         revision: main
         files:
-          - path: apps/thanos-store/application.yaml
-          - path: apps/thanos-query/application.yaml
           - path: apps/thanos-compactor/application.yaml
+          - path: apps/thanos-query/application.yaml
+          - path: apps/thanos-store/application.yaml
 
   template:
     metadata:
@@ -21,11 +21,11 @@ spec:
       project: default
       source:
         repoURL: https://github.com/earpjennings37/say_when_git_ops.git
-        path: '{{path.dir}}'          # ⭐ dynamic path
-        targetRevision: main          # ⭐ required
+        path: apps/{{path.basename}}
+        targetRevision: main
       destination:
         server: https://kubernetes.default.svc
-        namespace: thanos
+        namespace: monitoring
       syncPolicy:
         automated:
           prune: true
