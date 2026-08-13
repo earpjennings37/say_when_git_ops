@@ -8,20 +8,10 @@ spec:
     - git:
         repoURL: https://github.com/earpjennings37/say_when_git_ops.git
         revision: main
-        directories:
-          - path: apps/metrics-server
+        files:
+          - path: apps/metrics-server/application.yaml
 
   template:
     metadata:
       name: metrics-server
       namespace: argocd
-
-    spec:
-      project: default
-      destination:
-        server: https://kubernetes.default.svc
-        namespace: kube-system
-      syncPolicy:
-        automated:
-          prune: true
-          selfHeal: true

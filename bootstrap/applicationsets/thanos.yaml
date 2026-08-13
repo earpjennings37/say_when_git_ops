@@ -8,22 +8,12 @@ spec:
     - git:
         repoURL: https://github.com/earpjennings37/say_when_git_ops.git
         revision: main
-        directories:
-          - path: apps/thanos-store
-          - path: apps/thanos-query
-          - path: apps/thanos-compactor
+        files:
+          - path: apps/thanos-store/application.yaml
+          - path: apps/thanos-query/application.yaml
+          - path: apps/thanos-compactor/application.yaml
 
   template:
     metadata:
       name: '{{path.basename}}'
       namespace: argocd
-
-    spec:
-      project: default
-      destination:
-        server: https://kubernetes.default.svc
-        namespace: thanos
-      syncPolicy:
-        automated:
-          prune: true
-          selfHeal: true

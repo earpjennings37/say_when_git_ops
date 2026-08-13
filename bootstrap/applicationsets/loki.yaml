@@ -1,27 +1,26 @@
 apiVersion: argoproj.io/v1alpha1
-kind: ApplicationSet
+kind: Application
 metadata:
-  name: loki
+  name: kube-prometheus-stack
   namespace: argocd
 spec:
-  generators:
-    - git:
-        repoURL: https://github.com/earpjennings37/say_when_git_ops.git
-        revision: main
-        directories:
-          - path: apps/loki
+  project: default
 
-  template:
-    metadata:
-      name: loki
-      namespace: argocd
+  source:
+    repoURL: https://github.com/prometheus-community/helm-charts.git
+    chart: kube-prometheus-stack
+    targetRevision: 58.2.2
+    helm:
+      valuesFiles:
+        - values.yaml
+        - monitoring.yaml
+        - objstore.yaml
 
-    spec:
-      project: default
-      destination:
-        server: https://kubernetes.default.svc
-        namespace: loki
-      syncPolicy:
-        automated:
-          prune: true
-          selfHeal: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
