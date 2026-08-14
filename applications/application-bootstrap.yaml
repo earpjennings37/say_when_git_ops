@@ -148,9 +148,9 @@ spec:
   project: default
 
   sources:
-    - repoURL: oci://registry-1.docker.io/bitnamicharts/thanos
+    - repoURL: registry-1.docker.io/bitnamicharts
+      chart: thanos
       targetRevision: 17.3.1
-      path: .
       helm:
         valueFiles:
           - $values/apps/thanos/values.yaml
