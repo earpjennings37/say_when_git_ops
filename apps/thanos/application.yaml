@@ -6,9 +6,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/thanos-io/thanos.git
+    repoURL: https://charts.bitnami.com/bitnami
     chart: thanos
-    targetRevision: 0.34.0
+    targetRevision: 12.7.0
     helm:
       valueFiles:
         - apps/thanos/values.yaml
