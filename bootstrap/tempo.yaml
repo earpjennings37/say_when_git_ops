@@ -1,30 +1,21 @@
 apiVersion: argoproj.io/v1alpha1
-kind: ApplicationSet
+kind: Application
 metadata:
   name: tempo
   namespace: argocd
 spec:
-  generators:
-    - git:
-        repoURL: https://github.com/earpjennings37/say_when_git_ops.git
-        revision: main
-        files:
-          - path: apps/tempo/application.yaml
-
-  template:
-    metadata:
-      name: tempo
-      namespace: argocd
-    spec:
-      project: default
-      source:
-        repoURL: https://github.com/earpjennings37/say_when_git_ops.git
-        path: apps/tempo
-        targetRevision: main
-      destination:
-        server: https://kubernetes.default.svc
-        namespace: monitoring
-      syncPolicy:
-        automated:
-          prune: true
-          selfHeal: true
+  project: default
+  source:
+    repoURL: https://grafana.github.io/helm-charts
+    chart: tempo
+    targetRevision: 1.7.0
+    helm:
+      valueFiles:
+        - apps/tempo/values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
