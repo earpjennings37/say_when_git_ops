@@ -1,6 +1,15 @@
 # -----------------------------
 # S3 Object Storage (IRSA)
 # -----------------------------
+global:
+  security:
+    allowInsecureImages: true
+
+image:
+  registry: docker.io
+  repository: bitnamilegacy/thanos
+  tag: 0.39.2-debian-12-r2
+  
 objstoreConfig:
   type: s3
   config:
