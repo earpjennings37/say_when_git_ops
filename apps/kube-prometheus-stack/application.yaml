@@ -5,13 +5,23 @@ metadata:
   namespace: argocd
 spec:
   project: default
-  source:
-    repoURL: https://github.com/earpjennings37/say_when_git_ops.git
-    targetRevision: main
-    path: apps/kube-prometheus-stack
+
+  sources:
+    - repoURL: https://prometheus-community.github.io/helm-charts
+      chart: kube-prometheus-stack
+      targetRevision: main
+      helm:
+        valueFiles:
+          - $values/apps/kube-prometheus-stack/values.yaml
+
+    - repoURL: https://github.com/earpjennings37/say_when_git_ops.git
+      targetRevision: main
+      ref: values
+
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
+
   syncPolicy:
     automated:
       prune: true
