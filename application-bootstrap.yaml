@@ -8,105 +8,10 @@ spec:
   source:
     repoURL: https://github.com/earpjennings37/say_when_git_ops.git
     targetRevision: main
-    path: .
+    path: bootstrap
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
----
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: kube-prometheus-stack
-  namespace: argocd
-spec:
-  project: default
-  source:
-    repoURL: https://github.com/earpjennings37/say_when_git_ops.git
-    targetRevision: main
-    path: apps/kube-prometheus-stack
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: monitoring
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
----
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: loki
-  namespace: argocd
-spec:
-  project: default
-  source:
-    repoURL: https://github.com/earpjennings37/say_when_git_ops.git
-    targetRevision: main
-    path: apps/loki
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: monitoring
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
----
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: tempo
-  namespace: argocd
-spec:
-  project: default
-  source:
-    repoURL: https://github.com/earpjennings37/say_when_git_ops.git
-    targetRevision: main
-    path: apps/tempo
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: monitoring
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
----
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: metrics-server
-  namespace: argocd
-spec:
-  project: default
-  source:
-    repoURL: https://github.com/earpjennings37/say_when_git_ops.git
-    targetRevision: main
-    path: apps/metrics-server
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: monitoring
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
----
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: thanos
-  namespace: argocd
-spec:
-  project: default
-  source:
-    repoURL: https://github.com/earpjennings37/say_when_git_ops.git
-    targetRevision: main
-    path: apps/thanos
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: monitoring
   syncPolicy:
     automated:
       prune: true
