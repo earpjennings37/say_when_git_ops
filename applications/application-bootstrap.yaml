@@ -27,15 +27,16 @@ spec:
       kind: Deployment
       name: kube-prometheus-stack-grafana
       namespace: monitoring
-      managedFieldsManagers:
-        - kube-controller-manager
+      jqPathExpressions:
+        - '.spec.template.spec.containers[] | select(.name == "grafana-sc-dashboard") | .resources'
+        - '.spec.template.spec.containers[] | select(.name == "grafana-sc-datasources") | .resources'
 
     - group: apps
       kind: DaemonSet
       name: kube-prometheus-stack-prometheus-node-exporter
       namespace: monitoring
-      managedFieldsManagers:
-        - kube-controller-manager
+      jqPathExpressions:
+        - '.spec.template.spec.containers[] | select(.name == "node-exporter") | .resources'
 
   syncPolicy:
     automated:
