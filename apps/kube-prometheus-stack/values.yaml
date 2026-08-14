@@ -6,6 +6,9 @@
 # command line:kubectl port-forward svc/kube-prometheus-stack-grafana -n monitoring 3000:80 & then http://localhost:3000
 # in k9: svc, shift-f, :secrets, x 
 
+crds:
+  enabled: true
+
 grafana:
   enabled: true
   adminPassword: "admin"
@@ -42,12 +45,15 @@ prometheus:
 
     # Smallest safe storage volume
     storageSpec:
-      volumeClaimTemplate:
-        spec:
-          accessModes: ["ReadWriteOnce"]
-          resources:
-            requests:
-              storage: 2Gi
+  volumeClaimTemplate:
+    spec:
+      storageClassName: gp3
+      accessModes:
+        - ReadWriteOnce
+
+      resources:
+        requests:
+          storage: 2Gi
 
     # Reduce CPU/memory footprint
     resources:

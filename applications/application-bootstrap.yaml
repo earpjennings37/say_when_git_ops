@@ -99,7 +99,7 @@ spec:
   sources:
     - repoURL: https://charts.bitnami.com/bitnami
       chart: thanos
-      targetRevision: 12.7.0
+      targetRevision: 17.3.1
       helm:
         valueFiles:
           - $values/apps/thanos/values.yaml
