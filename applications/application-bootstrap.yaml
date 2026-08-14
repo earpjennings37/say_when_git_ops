@@ -22,13 +22,30 @@ spec:
     server: https://kubernetes.default.svc
     namespace: monitoring
 
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      name: kube-prometheus-stack-grafana
+      namespace: monitoring
+      managedFieldsManagers:
+        - kube-controller-manager
+
+    - group: apps
+      kind: DaemonSet
+      name: kube-prometheus-stack-prometheus-node-exporter
+      namespace: monitoring
+      managedFieldsManagers:
+        - kube-controller-manager
+
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
+
     syncOptions:
       - ServerSideApply=true
       - Replace=true
+      - RespectIgnoreDifferences=true
 
 ---
 apiVersion: argoproj.io/v1alpha1
