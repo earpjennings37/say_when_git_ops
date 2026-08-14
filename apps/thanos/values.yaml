@@ -15,14 +15,11 @@ serviceAccount:
     eks.amazonaws.com/role-arn: arn:aws:iam::026090519635:role/thanos-irsa-role
 
 # -----------------------------
-# Thanos Query (cheap + essential)
+# Thanos Query
 # -----------------------------
 query:
   enabled: true
   replicaCount: 1
-
-  stores:
-    - thanos-storegateway.monitoring.svc.cluster.local:10901
 
   resources:
     requests:
@@ -33,7 +30,7 @@ query:
       memory: 256Mi
 
 # -----------------------------
-# Thanos Store Gateway (cheap)
+# Thanos Store Gateway
 # -----------------------------
 storegateway:
   enabled: true
@@ -53,7 +50,7 @@ storegateway:
       memory: 512Mi
 
 # -----------------------------
-# Thanos Compactor (cheap)
+# Thanos Compactor
 # -----------------------------
 compactor:
   enabled: true
@@ -76,22 +73,11 @@ compactor:
       memory: 256Mi
 
 # -----------------------------
-# Bucket Web (tiny)
+# Disable non-essential components
 # -----------------------------
 bucketweb:
-  enabled: true
+  enabled: false
 
-  resources:
-    requests:
-      cpu: 20m
-      memory: 64Mi
-    limits:
-      cpu: 100m
-      memory: 128Mi
-
-# -----------------------------
-# Disable expensive components
-# -----------------------------
 queryFrontend:
   enabled: false
 

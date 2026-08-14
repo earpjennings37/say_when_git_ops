@@ -34,19 +34,11 @@ prometheus:
   prometheusSpec:
     # Minimal retention to reduce EBS cost
     retention: 24h
-    retenetionSize: 1GB
+    retentionSize: 1GB
     replicas: 1
     walCompression: true
-    serviceAccountName: prometheus-kube-prometheus-prometheus
-    serviceAccountAnnotations:
-      eks.amazonaws.com/role-arn: arn:aws:iam::<YOUR-AWS-ACCOUNT-ID>:role/thanos-irsa-role
 
     thanos: null
-    # thanos:
-      # image: "quay.io/thanos/thanos:v0.42.0"
-      # objectStorageConfig:
-        # name: thanos-objstore
-        # key: objstore.yml
 
     # Smallest safe storage volume
     storageSpec:
