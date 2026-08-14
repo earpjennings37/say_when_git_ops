@@ -23,11 +23,11 @@ query:
 
   resources:
     requests:
-      cpu: 50m
-      memory: 128Mi
+      cpu: 25m
+      memory: 64Mi
     limits:
-      cpu: 200m
-      memory: 256Mi
+      cpu: 100m
+      memory: 128Mi
 
 # -----------------------------
 # Thanos Store Gateway
@@ -43,34 +43,17 @@ storegateway:
 
   resources:
     requests:
-      cpu: 100m
-      memory: 256Mi
+      cpu: 50m
+      memory: 128Mi
     limits:
-      cpu: 300m
-      memory: 512Mi
+      cpu: 150m
+      memory: 256Mi
 
 # -----------------------------
 # Thanos Compactor
 # -----------------------------
 compactor:
-  enabled: true
-
-  persistence:
-    enabled: true
-    size: 5Gi
-    storageClass: gp3
-
-  retentionResolutionRaw: 7d
-  retentionResolution5m: 30d
-  retentionResolution1h: 90d
-
-  resources:
-    requests:
-      cpu: 50m
-      memory: 128Mi
-    limits:
-      cpu: 200m
-      memory: 256Mi
+  enabled: false
 
 # -----------------------------
 # Disable non-essential components
