@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: monitoring-stack
+  namespace: argocd
+spec:
+  generators:
+    - git:
+        repoURL: https://github.com/earpjennings37/say_when_git_ops.git
+        revision: main
+        directories:
+          - path: apps/*
+  template:
+    metadata:
+      namespace: argocd
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/earpjennings37/say_when_git_ops.git
+        targetRevision: main
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: monitoring
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
