@@ -1,6 +1,0 @@
-type: s3
-config:
-  bucket: "thanos-infinity-37"
-  endpoint: "s3.amazonaws.com"
-  region: "us-east-1"
-  insecure: false

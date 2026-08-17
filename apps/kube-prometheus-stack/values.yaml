@@ -5,10 +5,8 @@
 # Access Grafana 2 ways:
 # command line:kubectl port-forward svc/kube-prometheus-stack-grafana -n monitoring 3000:80 & then http://localhost:3000
 # in k9: svc, shift-f, :secrets, x 
-
 crds:
   enabled: true
-
 grafana:
   enabled: true
   adminPassword: "admin"
@@ -26,7 +24,6 @@ grafana:
       cpu: 100m
       memory: 200Mi
 
-
 # ============================
 # PROMETHEUS (CHEAP MODE)
 # ============================
@@ -40,8 +37,17 @@ prometheus:
     retentionSize: 1GB
     replicas: 1
     walCompression: true
+    
+    serviceAccountName: prometheus-kube-prometheus-prometheus
 
-    thanos: null
+    serviceAccountAnnotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::026090519635:role/thanos-irsa-role
+
+    thanos:
+      objectStorageConfig:
+        existingSecret:
+          name: thanos-objstore
+          key: objstore.yml
 
     # Smallest safe storage volume
     storageSpec:
