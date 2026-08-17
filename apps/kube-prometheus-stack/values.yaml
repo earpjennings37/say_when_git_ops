@@ -111,3 +111,7 @@ prometheusOperator:
     limits:
       cpu: 100m
       memory: 100Mi
+  prometheusOperator:
+  admissionWebhooks:
+    patch:
+      enabled: false
