@@ -113,5 +113,6 @@ prometheusOperator:
       memory: 100Mi
   prometheusOperator:
   admissionWebhooks:
+    enabled: false
     patch:
       enabled: false
