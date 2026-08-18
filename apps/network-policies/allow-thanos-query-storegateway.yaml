@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-thanos-query-to-storegateway
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: thanos
+      app.kubernetes.io/component: storegateway
+
+  policyTypes:
+    - Ingress
+
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: thanos
+              app.kubernetes.io/component: query
+      ports:
+        - protocol: TCP
+          port: 10901
