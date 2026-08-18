@@ -1,0 +1,91 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-egress-prometheus
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: prometheus
+
+  policyTypes:
+    - Egress
+
+  egress:
+    # Prometheus -> kube-state-metrics
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: kube-state-metrics
+      ports:
+        - protocol: TCP
+          port: 8080
+
+    # Prometheus -> node-exporter
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus-node-exporter
+      ports:
+        - protocol: TCP
+          port: 9100
+
+    # Prometheus -> Prometheus Operator
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: kube-prometheus-stack-prometheus-operator
+      ports:
+        - protocol: TCP
+          port: 8080
+
+    # Prometheus -> Grafana metrics
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: grafana
+      ports:
+        - protocol: TCP
+          port: 3000
+
+    # Prometheus -> itself / sidecar metrics
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus
+      ports:
+        - protocol: TCP
+          port: 8080
+        - protocol: TCP
+          port: 9090
+
+    # Prometheus -> CoreDNS metrics
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: TCP
+          port: 9153
+
+    # Prometheus -> node/control-plane targets inside VPC
+    - to:
+        - ipBlock:
+            cidr: 10.0.0.0/16
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 10249
+        - protocol: TCP
+          port: 10250
+        - protocol: TCP
+          port: 9100
+
+    # Prometheus Thanos sidecar -> S3/HTTPS
+    - ports:
+        - protocol: TCP
+          port: 443

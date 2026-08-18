@@ -1,0 +1,54 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-egress-thanos-query
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: thanos
+      app.kubernetes.io/component: query
+
+  policyTypes:
+    - Egress
+
+  egress:
+    # Thanos Query -> Store Gateway
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: thanos
+              app.kubernetes.io/component: storegateway
+      ports:
+        - protocol: TCP
+          port: 10901
+
+    # Thanos Query -> Prometheus Thanos sidecar
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus
+      ports:
+        - protocol: TCP
+          port: 10901
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-egress-thanos-storegateway
+  namespace: monitoring
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: thanos
+      app.kubernetes.io/component: storegateway
+
+  policyTypes:
+    - Egress
+
+  egress:
+    # Store Gateway -> S3 over HTTPS
+    - ports:
+        - protocol: TCP
+          port: 443
