@@ -1,0 +1,12 @@
+# Dont apply first, break DNS - build all allow first & then enable default-deny last.
+
+#apiVersion: networking.k8s.io/v1
+#kind: NetworkPolicy
+#metadata:
+  #name: default-deny
+  #namespace: monitoring
+#spec:
+  #podSelector: {}
+  #policyTypes:
+    #- Ingress
+    #- Egress
