@@ -9,7 +9,7 @@ image:
   registry: docker.io
   repository: bitnamilegacy/thanos
   tag: 0.39.2-debian-12-r2
-  
+
 objstoreConfig:
   type: s3
   config:
@@ -29,6 +29,10 @@ serviceAccount:
 query:
   enabled: true
   replicaCount: 1
+
+  stores:
+    - dnssrv+_grpc._tcp.thanos-storegateway.monitoring.svc.cluster.local
+    - prometheus-operated.monitoring.svc.cluster.local:10901
 
   resources:
     requests:
