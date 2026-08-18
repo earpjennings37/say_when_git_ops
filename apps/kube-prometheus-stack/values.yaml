@@ -11,6 +11,19 @@ grafana:
   enabled: true
   adminPassword: "admin"
 
+  additionalDataSources:
+    - name: Loki
+      type: loki
+      access: proxy
+      url: http://loki-gateway.monitoring
+      editable: false
+
+    - name: Tempo
+      type: tempo
+      access: proxy
+      url: http://tempo.monitoring:3100
+      editable: false
+
   # No AWS LoadBalancer
   service:
     type: ClusterIP
