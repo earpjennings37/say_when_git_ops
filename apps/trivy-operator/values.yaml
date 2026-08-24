@@ -1,0 +1,37 @@
+# Scan all namespaces.
+targetNamespaces: ""
+
+operator:
+  replicas: 1
+
+  # Default is 10. Lower this for the small lab so scans
+  # do not all compete for CPU/memory at once.
+  scanJobsConcurrentLimit: 2
+
+  scanJobTimeout: 5m
+
+# Do not add Trivy metrics to Prometheus yet.
+serviceMonitor:
+  enabled: false
+
+trivy:
+  # Report vulnerabilities that currently have a fix available.
+  ignoreUnfixed: true
+
+  # Limit reports to the vulnerabilities most worth reviewing.
+  severity: HIGH,CRITICAL
+
+  # Lower-resource scanning mode.
+  slow: true
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 100M
+    limits:
+      cpu: 500m
+      memory: 500M
+
+# Keep compliance scanning enabled with the chart defaults.
+compliance:
+  reportType: summary
