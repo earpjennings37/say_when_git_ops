@@ -16,7 +16,7 @@ spec:
 
           containers:
             - name: popeye
-              image: derailed/popeye:latest
+              image: 026090519635.dkr.ecr.us-east-1.amazonaws.com/popeye-arm64:0.22.1-arm64
               imagePullPolicy: IfNotPresent
 
               command:
