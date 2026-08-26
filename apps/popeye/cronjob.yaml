@@ -23,6 +23,7 @@ spec:
                 - /bin/popeye
 
               args:
+                - -A
                 - -o
                 - yaml
                 - --force-exit-zero
