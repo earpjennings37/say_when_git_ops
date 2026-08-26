@@ -16,8 +16,11 @@ spec:
 
           containers:
             - name: popeye
-              image: derailed/popeye:v0.22.1
+              image: derailed/popeye:latest
               imagePullPolicy: IfNotPresent
+
+              command:
+                - /bin/popeye
 
               args:
                 - -o
