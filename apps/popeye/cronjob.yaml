@@ -1,0 +1,33 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: popeye
+  namespace: popeye
+spec:
+  schedule: "0 * * * *"
+  concurrencyPolicy: Forbid
+
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: popeye
+          restartPolicy: Never
+
+          containers:
+            - name: popeye
+              image: derailed/popeye:v0.21.5
+              imagePullPolicy: IfNotPresent
+
+              args:
+                - -o
+                - yaml
+                - --force-exit-zero
+
+              resources:
+                requests:
+                  cpu: 25m
+                  memory: 64Mi
+                limits:
+                  cpu: 100m
+                  memory: 128Mi

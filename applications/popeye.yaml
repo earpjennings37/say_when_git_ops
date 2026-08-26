@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: popeye
+  namespace: argocd
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/earpjennings37/say_when_git_ops.git
+    targetRevision: main
+    path: apps/popeye
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: popeye
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+
+    syncOptions:
+      - CreateNamespace=true
