@@ -35,7 +35,7 @@ spec:
                 - node,policies,managedservices
                 - --benchmark
                 - eks-1.5.0
-                - --noremediations
+                - --noremediations #if want to see remediation suggestions, remove this flag
 
               resources:
                 requests:
