@@ -1,0 +1,71 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: kube-bench
+  namespace: kube-bench
+spec:
+  schedule: "0 6 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+
+      template:
+        metadata:
+          labels:
+            app: kube-bench
+
+        spec:
+          serviceAccountName: kube-bench
+          restartPolicy: Never
+          hostPID: true
+
+          containers:
+            - name: kube-bench
+              image: docker.io/aquasec/kube-bench:v0.15.6
+              imagePullPolicy: IfNotPresent
+
+              command:
+                - kube-bench
+                - run
+                - --targets
+                - node,policies,managedservices
+                - --benchmark
+                - eks-1.5.0
+
+              resources:
+                requests:
+                  cpu: 25m
+                  memory: 64Mi
+                limits:
+                  cpu: 200m
+                  memory: 256Mi
+
+              volumeMounts:
+                - name: var-lib-kubelet
+                  mountPath: /var/lib/kubelet
+                  readOnly: true
+
+                - name: etc-systemd
+                  mountPath: /etc/systemd
+                  readOnly: true
+
+                - name: etc-kubernetes
+                  mountPath: /etc/kubernetes
+                  readOnly: true
+
+          volumes:
+            - name: var-lib-kubelet
+              hostPath:
+                path: /var/lib/kubelet
+
+            - name: etc-systemd
+              hostPath:
+                path: /etc/systemd
+
+            - name: etc-kubernetes
+              hostPath:
+                path: /etc/kubernetes
