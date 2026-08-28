@@ -1,0 +1,24 @@
+driver:
+  enabled: true
+  kind: modern_ebpf
+
+  modernEbpf:
+    leastPrivileged: true
+
+tty: true
+
+falco:
+  json_output: true
+  priority: warning
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+# Can forward Slack, Lambda, Kafka, etc but adds noise for now
+falcosidekick:
+  enabled: false
