@@ -19,6 +19,8 @@ resources:
     cpu: 500m
     memory: 512Mi
 
-# Can forward Slack, Lambda, Kafka, etc but adds noise for now
 falcosidekick:
-  enabled: false
+  enabled: true
+
+  webui:
+    enabled: true
