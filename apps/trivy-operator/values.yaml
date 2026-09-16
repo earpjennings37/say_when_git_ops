@@ -27,10 +27,10 @@ trivy:
   resources:
     requests:
       cpu: 100m
-      memory: 100M
+      memory: 192M
     limits:
       cpu: 500m
-      memory: 500M
+      memory: 384M
 
 # Keep compliance scanning enabled with the chart defaults.
 compliance:

@@ -31,11 +31,11 @@ grafana:
   # Reduce resource usage
   resources:
     requests:
-      cpu: 20m
-      memory: 100Mi
-    limits:
       cpu: 100m
-      memory: 200Mi
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
 
 # ============================
 # PROMETHEUS (CHEAP MODE)
@@ -77,10 +77,11 @@ prometheus:
     # Reduce CPU/memory footprint
     resources:
       requests:
-        cpu: 50m
-        memory: 200Mi
+        cpu: 100m
+        memory: 512Mi
       limits:
-        memory: 400Mi
+        cpu: 500m
+        memory: 1Gi
 
 
 # ============================
