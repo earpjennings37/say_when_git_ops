@@ -41,3 +41,6 @@ cleanupController:
     limits:
       cpu: 200m
       memory: 256Mi
+
+crds:
+  install: true
