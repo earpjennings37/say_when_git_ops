@@ -44,6 +44,5 @@ cleanupController:
 
 crds:
   install: true
-
-migration:
-  enabled: false
+  migration:
+    enabled: false
