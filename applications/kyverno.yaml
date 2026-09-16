@@ -30,12 +30,15 @@ spec:
       kind: CustomResourceDefinition
       jqPathExpressions:
         - .spec.versions[].schema.openAPIV3Schema
+      jsonPointers:
+        - /spec/conversion
+        - /metadata/annotations
+        - /metadata/labels
 
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
-
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
