@@ -1,0 +1,37 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+
+metadata:
+  name: require-labels
+
+  annotations:
+    policies.kyverno.io/title: Require Application Labels
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+
+spec:
+  validationActions:
+    - Audit
+
+  evaluation:
+    background:
+      enabled: true
+
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - ""
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - pods
+
+  validations:
+    - expression: >-
+        object.metadata.?labels["app.kubernetes.io/name"].orValue("") != ""
+      message: >-
+        Pods should define the label app.kubernetes.io/name.
