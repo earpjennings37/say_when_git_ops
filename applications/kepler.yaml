@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kepler
+  namespace: argocd
+spec:
+  project: default
+
+  sources:
+    - repoURL: quay.io/sustainable_computing_io/charts
+      chart: kepler
+      targetRevision: 0.11.1
+      helm:
+        valueFiles:
+          - $values/apps/kepler/values.yaml
+
+    - repoURL: https://github.com/earpjennings37/say_when_git_ops.git
+      targetRevision: main
+      ref: values
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kepler
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

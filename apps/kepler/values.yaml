@@ -1,0 +1,26 @@
+image:
+  repository: quay.io/sustainable_computing_io/kepler
+  pullPolicy: IfNotPresent
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 250m
+    memory: 256Mi
+
+nodeSelector:
+  kubernetes.io/os: linux
+  kubernetes.io/arch: arm64
+
+tolerations:
+  - operator: Exists
+
+serviceMonitor:
+  enabled: true
+  interval: 30s
+  scrapeTimeout: 10s
+
+service:
+  type: ClusterIP
