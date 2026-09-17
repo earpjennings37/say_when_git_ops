@@ -1,0 +1,47 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+
+metadata:
+  name: disallow-privilege-escalation
+
+  annotations:
+    policies.kyverno.io/title: Disallow Privilege Escalation
+    policies.kyverno.io/category: Pod Security Standards
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/subject: Pod
+
+spec:
+  validationActions:
+    - Audit
+
+  evaluation:
+    background:
+      enabled: true
+
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - ""
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - pods
+
+  variables:
+    - name: allContainers
+      expression: >-
+        object.spec.containers +
+        object.spec.?initContainers.orValue([]) +
+        object.spec.?ephemeralContainers.orValue([])
+
+  validations:
+    - expression: >-
+        variables.allContainers.all(
+          container,
+          container.?securityContext.?allowPrivilegeEscalation.orValue(true) == false
+        )
+      message: >-
+        Containers should set securityContext.allowPrivilegeEscalation to false.
