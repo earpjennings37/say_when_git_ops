@@ -3,9 +3,8 @@ kind: ValidatingPolicy
 
 metadata:
   name: disallow-latest-tag
-
   annotations:
-    policies.kyverno.io/title: Disallow Latest Image Tag
+    policies.kyverno.io/title: Require Explicit Image Version
     policies.kyverno.io/category: Best Practices
     policies.kyverno.io/severity: medium
     policies.kyverno.io/subject: Pod
@@ -19,6 +18,13 @@ spec:
       enabled: true
 
   matchConstraints:
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values:
+            - kube-system
+
     resourceRules:
       - apiGroups:
           - ""
@@ -41,8 +47,12 @@ spec:
     - expression: >-
         variables.allContainers.all(
           container,
-          !container.image.endsWith(":latest")
+          container.image.contains("@") ||
+          (
+            container.image.matches("^.+:[^/:]+$") &&
+            !container.image.endsWith(":latest")
+          )
         )
       message: >-
-        Containers should use a versioned image tag or immutable digest instead
-        of the latest tag.
+        Container images must use an explicit version tag or immutable digest.
+        The latest tag and images without a tag are not permitted.
