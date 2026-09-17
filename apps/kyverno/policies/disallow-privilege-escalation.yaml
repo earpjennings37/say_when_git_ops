@@ -12,7 +12,7 @@ metadata:
 
 spec:
   validationActions:
-    - Audit
+    - Deny
 
   evaluation:
     background:
