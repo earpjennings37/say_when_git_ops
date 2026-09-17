@@ -3,11 +3,10 @@ kind: ValidatingPolicy
 
 metadata:
   name: disallow-privileged
-
   annotations:
     policies.kyverno.io/title: Disallow Privileged Containers
     policies.kyverno.io/category: Pod Security Standards
-    policies.kyverno.io/severity: medium
+    policies.kyverno.io/severity: high
     policies.kyverno.io/subject: Pod
 
 spec:
@@ -19,6 +18,13 @@ spec:
       enabled: true
 
   matchConstraints:
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values:
+            - kube-system
+
     resourceRules:
       - apiGroups:
           - ""
