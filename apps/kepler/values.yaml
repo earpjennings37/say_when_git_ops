@@ -1,6 +1,10 @@
 image:
   repository: quay.io/sustainable_computing_io/kepler
+  tag: "v0.11.1"
   pullPolicy: IfNotPresent
+
+securityContext:
+  privileged: true
 
 resources:
   requests:
@@ -17,10 +21,10 @@ nodeSelector:
 tolerations:
   - operator: Exists
 
+service:
+  type: ClusterIP
+
 serviceMonitor:
   enabled: true
   interval: 30s
   scrapeTimeout: 10s
-
-service:
-  type: ClusterIP
