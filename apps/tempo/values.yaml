@@ -16,7 +16,6 @@ tempo:
       cpu: 100m
       memory: 200Mi
 
-  # Container security context
   securityContext:
     allowPrivilegeEscalation: false
     readOnlyRootFilesystem: false
@@ -24,19 +23,31 @@ tempo:
       drop:
         - ALL
 
+  extraVolumeMounts:
+    - name: tempo-data
+      mountPath: /var/tempo
 
-# Pod security context
+
+# Writable ephemeral storage for Tempo.
+extraVolumes:
+  - name: tempo-data
+    emptyDir: {}
+
+
+# Pod security context.
+# fsGroup gives GID 10001 write access to mounted volumes.
 securityContext:
   runAsNonRoot: true
   runAsUser: 10001
   runAsGroup: 10001
   fsGroup: 10001
+  fsGroupChangePolicy: OnRootMismatch
 
 
 service:
   type: ClusterIP
 
 
-# Traces are currently ephemeral.
+# Traces remain ephemeral.
 persistence:
   enabled: false
