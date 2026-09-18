@@ -1,3 +1,6 @@
+# ============================
+# TEMPO (CHEAP MODE)
+# ============================
 tempo:
   storage:
     trace:
@@ -5,29 +8,35 @@ tempo:
       local:
         path: /var/tempo/traces
 
-service:
-  type: ClusterIP
+  resources:
+    requests:
+      cpu: 20m
+      memory: 100Mi
+    limits:
+      cpu: 100m
+      memory: 200Mi
 
-persistence:
-  enabled: false
+  # Container security context
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+        - ALL
 
-podSecurityContext:
+
+# Pod security context
+securityContext:
   runAsNonRoot: true
   runAsUser: 10001
   runAsGroup: 10001
   fsGroup: 10001
 
-containerSecurityContext:
-  allowPrivilegeEscalation: false
-  readOnlyRootFilesystem: true
-  capabilities:
-    drop:
-      - ALL
 
-resources:
-  requests:
-    cpu: 20m
-    memory: 100Mi
-  limits:
-    cpu: 100m
-    memory: 200Mi
+service:
+  type: ClusterIP
+
+
+# Traces are currently ephemeral.
+persistence:
+  enabled: false
