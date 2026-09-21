@@ -49,10 +49,17 @@ spec:
     serviceAccountIRSA: arn:aws:iam::026090519635:role/k8sgpt-bedrock-irsa-role
 
     backstage:
-      enabled: true
+      enabled: false
 
   filters:
     - Pod
+    - Deployment
+    - StatefulSet
+    - DaemonSet
+    - Service
+    - Ingress
+    - PersistentVolumeClaim
+    - CronJob
 
   noCache: false
 
