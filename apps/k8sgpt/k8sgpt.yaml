@@ -1,0 +1,66 @@
+apiVersion: core.k8sgpt.ai/v1alpha1
+kind: K8sGPT
+
+metadata:
+  name: k8sgpt-bedrock
+  namespace: k8sgpt-operator-system
+
+  labels:
+    app.kubernetes.io/name: k8sgpt
+    app.kubernetes.io/component: analyzer
+
+spec:
+  ai:
+    enabled: true
+    backend: amazonbedrock
+    model: amazon.nova-lite-v1:0
+    region: us-east-1
+    anonymized: true
+    language: english
+    maxTokens: "2048"
+
+    backOff:
+      enabled: true
+      maxRetries: 3
+
+    autoRemediation:
+      enabled: false
+      resources:
+        - Pod
+        - Deployment
+      similarityRequirement: "90"
+
+  extraOptions:
+    serviceAccountIRSA: arn:aws:iam::026090519635:role/k8sgpt-bedrock-irsa-role
+
+  filters:
+    - Pod
+    - Deployment
+    - StatefulSet
+    - DaemonSet
+    - Service
+    - Ingress
+    - PersistentVolumeClaim
+    - CronJob
+
+  noCache: false
+
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 65532
+    runAsGroup: 65532
+
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    runAsNonRoot: true
+    capabilities:
+      drop:
+        - ALL
+
+  resources:
+    requests:
+      cpu: 25m
+      memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
