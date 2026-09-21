@@ -48,6 +48,9 @@ spec:
   extraOptions:
     serviceAccountIRSA: arn:aws:iam::026090519635:role/k8sgpt-bedrock-irsa-role
 
+    backstage:
+      enabled: true
+
   filters:
     - Pod
 
