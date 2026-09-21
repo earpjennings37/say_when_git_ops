@@ -10,6 +10,19 @@ metadata:
     app.kubernetes.io/component: analyzer
 
 spec:
+  # Pin the analyzer image instead of using latest.
+  repository: ghcr.io/k8sgpt-ai/k8sgpt
+  version: v0.4.39
+  imagePullPolicy: IfNotPresent
+
+  deploymentLabels:
+    app.kubernetes.io/name: k8sgpt
+    app.kubernetes.io/component: analyzer
+
+  podLabels:
+    app.kubernetes.io/name: k8sgpt
+    app.kubernetes.io/component: analyzer
+
   ai:
     enabled: true
     backend: amazonbedrock
