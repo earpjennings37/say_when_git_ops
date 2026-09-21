@@ -1,0 +1,63 @@
+# ============================
+# K8SGPT OPERATOR (CHEAP MODE)
+# ============================
+
+# Distributed cache is unnecessary for a single-replica lab.
+interplex:
+  enabled: false
+
+# Allow the operator to create RBAC for managed K8sGPT workloads.
+dynamicRBAC:
+  enabled: true
+
+# Add later after the operator is working.
+serviceMonitor:
+  enabled: false
+
+grafanaDashboard:
+  enabled: false
+
+grafanaOperator:
+  enabled: false
+
+
+controllerManager:
+  replicas: 1
+
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 65532
+    runAsGroup: 65532
+
+  manager:
+    enableResultLogging: false
+    sinkWebhookTimeout: 30s
+
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+
+  kubeRbacProxy:
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+
+    resources:
+      requests:
+        cpu: 5m
+        memory: 32Mi
+      limits:
+        cpu: 50m
+        memory: 64Mi
