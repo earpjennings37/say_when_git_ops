@@ -10,6 +10,8 @@ metadata:
     app.kubernetes.io/component: analyzer
 
 spec:
+  analysis:
+    interval: 5m
   # Pin the analyzer image instead of using latest.
   repository: ghcr.io/k8sgpt-ai/k8sgpt
   version: v0.4.39
