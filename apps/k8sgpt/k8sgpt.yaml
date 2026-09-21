@@ -50,13 +50,6 @@ spec:
 
   filters:
     - Pod
-    - Deployment
-    - StatefulSet
-    - DaemonSet
-    - Service
-    - Ingress
-    - PersistentVolumeClaim
-    - CronJob
 
   noCache: false
 
