@@ -1,0 +1,29 @@
+# kubectl-ai local configuration example
+#
+# This file is tracked in Git for documentation.
+# Copy it to ~/.config/kubectl-ai/config.yaml before using kubectl-ai.
+#
+# AWS credentials are intentionally not stored here.
+# kubectl-ai uses the normal AWS SDK credential chain.
+
+# Amazon Bedrock provider
+llmProvider: bedrock
+
+# Bedrock cross-region inference profile
+model: us.anthropic.claude-sonnet-4-20250514-v1:0
+
+# Use the current user's Kubernetes configuration
+kubeconfig: ~/.kube/config
+
+# Require approval before commands are executed
+skipPermissions: false
+
+# Limit the number of agent/tool iterations per request
+maxIterations: 10
+
+# Use interactive terminal output
+quiet: false
+uiType: terminal
+
+# Remove temporary working files after each session
+removeWorkdir: true
