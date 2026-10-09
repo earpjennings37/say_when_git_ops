@@ -19,7 +19,7 @@ kubeconfig: ~/.kube/config
 skipPermissions: false
 
 # Limit the number of agent/tool iterations per request
-maxIterations: 20
+maxIterations: 10
 
 # Use interactive terminal output
 quiet: false
