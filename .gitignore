@@ -74,3 +74,12 @@ Thumbs.db
 # ----------------------------------------
 venv/
 .env/
+# Terraform local files
+*.tfstate
+*.tfstate.*
+.terraform/
+tfplan
+crash.log
+
+# Local kubectl-ai configuration
+.config/
