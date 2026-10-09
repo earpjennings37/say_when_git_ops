@@ -9,8 +9,8 @@
 # Amazon Bedrock provider
 llmProvider: bedrock
 
-# Bedrock cross-region inference profile
-model: us.anthropic.claude-sonnet-4-20250514-v1:0
+# Current Anthropic Claude US cross-region inference profile
+model: us.anthropic.claude-sonnet-4-6
 
 # Use the current user's Kubernetes configuration
 kubeconfig: ~/.kube/config
@@ -18,8 +18,11 @@ kubeconfig: ~/.kube/config
 # Require approval before commands are executed
 skipPermissions: false
 
-# Limit the number of agent/tool iterations per request
-maxIterations: 10
+# Claude supports native Bedrock tool use.
+enableToolUseShim: false
+
+# Keep this low while the kubectl-ai Bedrock command-loop bug is open.
+maxIterations: 3
 
 # Use interactive terminal output
 quiet: false
