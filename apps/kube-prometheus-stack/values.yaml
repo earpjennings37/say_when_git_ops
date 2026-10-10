@@ -19,7 +19,13 @@ crds:
 
 grafana:
   enabled: true
-  adminPassword: "admin"
+
+  # Credentials are provided through a separately managed
+  # Kubernetes Secret and are not committed to Git.
+  admin:
+    existingSecret: grafana-admin-credentials
+    userKey: admin-user
+    passwordKey: admin-password
 
   additionalDataSources:
     - name: Loki

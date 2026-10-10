@@ -21,6 +21,8 @@ spec:
 
           containers:
             - name: popeye
+            # Custom ARM64 Popeye image stored in private Amazon ECR.
+            # EKS nodes receive pull access through their node IAM role.
               image: 026090519635.dkr.ecr.us-east-1.amazonaws.com/popeye-arm64:0.22.1-arm64
               imagePullPolicy: IfNotPresent
 
