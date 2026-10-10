@@ -15,9 +15,6 @@ IF your more of "lemme see the sausage making process", feel free to parooze in 
 - Matt Foley - "im gonna be your shadow, were gonna be pals! were gonna wrestle around w/each-other!"
 - Bane - "i was born in the dark.."
 - Justin Gaethje - "people recongize max effort"
-- Leslie Chow from The Hangover - "whatchu talkin bout Willis!? dah him!?"
-- Penneywise - "here, take..it.."
-- Doc Holliday - "say when, im your huckleberry.."
 
 ## Architecture
 
