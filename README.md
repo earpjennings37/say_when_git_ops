@@ -1,12 +1,12 @@
 # Say When: EKS GitOps Platform
 
-This repository contains the declarative Kubernetes and GitOps configuration for my AWS EKS home lab. It documents my hands-on work with Kubernetes security, observability, policy enforcement, AI-assisted operations, and platform engineering.
+A GitOps repository for my AWS EKS DevSecOps home lab.
 
-The supporting AWS infrastructure is provisioned separately with Terraform in the `say_when_infra` repository.
+This project documents hands-on work with Kubernetes, Argo CD, Helm, cloud security, policy enforcement, observability, secrets management, and AI-assisted operations.
 
-For walkthroughs, screenshots, and lessons learned, visit:
+The supporting AWS infrastructure is provisioned separately with Terraform in the [`say_when_infra`](https://github.com/earpjennings37/say_when_infra) repository.
 
-[im-your-huckleberry.com](https://im-your-huckleberry.com/)
+For walkthroughs, screenshots, and lessons learned, visit [I'm Your Huckleberry](https://im-your-huckleberry.com/).
 
 > This is a cost-conscious learning environment and portfolio project. It is not intended to be a production-ready reference architecture without additional hardening.
 
@@ -20,33 +20,66 @@ IF your more of "lemme see the sausage making process", feel free to parooze in 
 
 ```mermaid
 flowchart TD
-    Git["GitOps repository"] --> Argo["Argo CD"]
-    Argo --> Security["Security tooling"]
-    Argo --> Observability["Observability stack"]
-    Argo --> Operations["Operational tooling"]
-
-    Security --> Kyverno["Kyverno"]
-    Security --> Falco["Falco"]
-    Security --> Trivy["Trivy Operator"]
-    Security --> NetPol["NetworkPolicies"]
-
-    Observability --> Prometheus["Prometheus"]
-    Observability --> Grafana["Grafana"]
-    Observability --> Loki["Loki"]
-    Observability --> Tempo["Tempo"]
-    Observability --> Thanos["Thanos"]
-
-    Operations --> K8sGPT["K8sGPT and Bedrock"]
-    Operations --> Popeye["Popeye"]
-    Operations --> KubeBench["kube-bench"]
+    Terraform["Terraform infrastructure"] --> Argo["Argo CD"]
+    Git["GitOps repository"] --> Argo
+    Argo --> Root["Root Applications"]
+    Root --> Projects["Argo CD AppProjects"]
+    Root --> AppSet["Security ApplicationSet"]
+    Projects --> Apps["Platform applications"]
+    AppSet --> Security["Security manifest applications"]
 ```
+
+Terraform provisions the AWS infrastructure and installs Argo CD. Argo CD then reconciles the Kubernetes applications and configuration stored in this repository.
+
+## GitOps flow
+
+1. Terraform provisions AWS networking, EKS, IAM, storage, and Argo CD.
+2. Terraform applies the `bootstrap-root` Argo CD Application.
+3. `bootstrap-root` manages the remaining bootstrap resources.
+4. `monitoring-root` discovers resources under `applications/lab`.
+5. Argo CD AppProjects restrict repositories, destinations, and resource types.
+6. ApplicationSets generate related Applications from reusable templates.
+7. Individual Applications deploy Helm charts or repository-managed manifests.
+8. Automated synchronization provides self-healing and pruning.
+
+Although it retains its original name, `monitoring-root` now manages all lab application categories—not only observability.
 
 ## Repository structure
 
 ```text
 .
-├── applications/              # Argo CD Application resources
-├── apps/                      # Helm values and Kubernetes manifests
+├── applications/
+│   └── lab/
+│       ├── ai-ops/
+│       │   ├── k8sgpt-operator.yaml
+│       │   └── k8sgpt.yaml
+│       ├── observability/
+│       │   ├── kube-prometheus-stack.yaml
+│       │   ├── loki.yaml
+│       │   ├── tempo.yaml
+│       │   └── thanos.yaml
+│       ├── platform/
+│       │   ├── gp3-storageclass.yaml
+│       │   ├── metrics-server.yaml
+│       │   └── monitoring-namespace.yaml
+│       ├── projects/
+│       │   ├── lab-ai-ops.yaml
+│       │   ├── lab-observability.yaml
+│       │   ├── lab-platform.yaml
+│       │   ├── lab-security.yaml
+│       │   └── lab-workloads.yaml
+│       ├── security/
+│       │   ├── external-secrets.yaml
+│       │   ├── falco.yaml
+│       │   ├── kyverno.yaml
+│       │   ├── security-manifests-appset.yaml
+│       │   └── trivy-operator.yaml
+│       └── workloads/
+│           ├── external-secrets-config.yaml
+│           └── secret-demo.yaml
+├── apps/
+│   ├── external-secrets/
+│   ├── external-secrets-config/
 │   ├── falco/
 │   ├── k8sgpt/
 │   ├── k8sgpt-operator/
@@ -57,138 +90,109 @@ flowchart TD
 │   ├── metrics-server/
 │   ├── network-policies/
 │   ├── popeye/
+│   ├── secret-demo/
 │   ├── tempo/
 │   ├── thanos/
 │   └── trivy-operator/
-├── bootstrap/                 # Argo CD root/bootstrap resources
-└── docs/                      # Supporting documentation and examples
-```
-
-## Platform components
-
-### GitOps
-
-- Argo CD
-- App-of-apps deployment model
-- Automated synchronization
-- Self-healing and pruning
-- Helm charts with Git-managed values
-- Sync waves for dependency ordering
-
-### Policy and security
-
-- Kyverno CEL-based
-
-Below are complete, portfolio-ready replacements for both README files. They preserve your personality while making the projects easier for employers and other engineers to understand.
-
-## GitOps README
-
-Replace `say_when_git_ops/README.md` with:
-
-````markdown
-# Say When GitOps
-
-A GitOps repository for my AWS EKS DevSecOps home lab.
-
-This project documents my hands-on journey with Kubernetes, GitOps, cloud security, policy enforcement, observability, and AI-assisted operations. The configurations are designed for a small, cost-conscious learning environment rather than a production deployment.
-
-For walkthroughs, screenshots, and explanations, visit my blog:
-
-[I'm Your Huckleberry](https://im-your-huckleberry.com/)
-
-## Architecture
-
-```mermaid
-flowchart TD
-    GitHub["GitHub repository"] --> ArgoCD["Argo CD"]
-    ArgoCD --> Security["Security tools"]
-    ArgoCD --> Monitoring["Monitoring stack"]
-    ArgoCD --> Operations["Operational tools"]
-
-    Security --> Kyverno["Kyverno policies"]
-    Security --> Falco["Falco"]
-    Security --> Trivy["Trivy Operator"]
-
-    Monitoring --> Prometheus["Prometheus"]
-    Monitoring --> Grafana["Grafana"]
-    Monitoring --> Loki["Loki"]
-    Monitoring --> Tempo["Tempo"]
-    Monitoring --> Thanos["Thanos"]
-
-    Operations --> K8sGPT["K8sGPT + Bedrock"]
-    Operations --> Popeye["Popeye"]
-    Operations --> KubeBench["kube-bench"]
-```
-
-Terraform creates the AWS infrastructure and installs Argo CD. Argo CD then reconciles the Kubernetes applications and configuration stored in this repository.
-
-The related infrastructure repository is:
-
-[Say When Infrastructure](https://github.com/earpjennings37/say_when_infra)
-
-## Repository structure
-
-```text
-.
-├── applications/                 # Argo CD Application resources
-├── apps/
-│   ├── falco/                    # Runtime threat detection
-│   ├── k8sgpt/                   # K8sGPT analyzer configuration
-│   ├── k8sgpt-operator/          # K8sGPT Operator Helm values
-│   ├── kube-bench/               # CIS benchmark CronJob and RBAC
-│   ├── kube-prometheus-stack/    # Prometheus and Grafana values
-│   ├── kyverno/                  # Kyverno values and CEL policies
-│   ├── loki/                     # Log-storage configuration
-│   ├── metrics-server/           # Kubernetes Metrics Server
-│   ├── network-policies/         # Monitoring NetworkPolicies
-│   ├── popeye/                   # Cluster linting CronJob and RBAC
-│   ├── tempo/                    # Trace-storage configuration
-│   ├── thanos/                   # Long-term metrics configuration
-│   └── trivy-operator/           # Vulnerability scanning
-├── bootstrap/                    # Root Argo CD bootstrap resources
-├── docs/                         # Local-tool configuration examples
+├── bootstrap/
+│   ├── argocd-namespace.yaml
+│   ├── bootstrap-root.yaml
+│   └── monitoring.yaml
+├── docs/
+│   └── kubectl-ai/
+│       └── config.example.yaml
 └── README.md
 ```
 
-## Applications
+The repository separates two concerns:
+
+- `applications/` defines what Argo CD deploys.
+- `apps/` contains Helm values and Kubernetes manifests used by those Applications.
+
+## Argo CD projects
+
+Applications are separated into AppProjects with explicit repository, destination, and Kubernetes resource permissions.
+
+| Project | Purpose |
+|---|---|
+| `default` | Root bootstrap Applications and directly managed cluster foundations |
+| `lab-security` | Security operators, policies, scanning, benchmarks, and network controls |
+| `lab-observability` | Metrics, dashboards, logs, traces, and long-term metrics |
+| `lab-ai-ops` | K8sGPT and AI-assisted Kubernetes analysis |
+| `lab-platform` | Core Kubernetes platform services |
+| `lab-workloads` | Demonstration workloads and application-specific secret configuration |
+
+Only these root Applications should remain in the `default` project:
+
+```text
+bootstrap-root
+monitoring-root
+```
+
+## ApplicationSet
+
+The `lab-security-manifests` ApplicationSet generates four manifest-based Argo CD Applications:
+
+| Generated Application | Repository path |
+|---|---|
+| `kube-bench` | `apps/kube-bench` |
+| `kyverno-policies` | `apps/kyverno/policies` |
+| `network-policies` | `apps/network-policies` |
+| `popeye` | `apps/popeye` |
+
+The ApplicationSet uses a list generator and manages the lifecycle of these child Applications.
+
+The actual Kubernetes manifests remain under `apps/`; the ApplicationSet creates Applications that point to those directories.
+
+## Platform components
 
 | Component | Purpose |
 |---|---|
 | Argo CD | Continuously reconciles the cluster with Git |
-| Kyverno | Applies CEL-based Kubernetes policy controls |
-| Falco | Detects suspicious runtime activity |
+| ApplicationSet | Generates related Argo CD Applications |
+| AppProjects | Restrict repositories, destinations, and resource types |
+| External Secrets Operator | Synchronizes AWS secrets into Kubernetes |
+| Kyverno | Applies CEL-based Kubernetes policies |
+| Falco | Detects suspicious runtime behavior |
 | Trivy Operator | Scans Kubernetes workloads and images |
-| K8sGPT | Analyzes Kubernetes issues using Amazon Bedrock |
 | kube-bench | Runs CIS Kubernetes benchmark checks |
 | Popeye | Identifies Kubernetes configuration problems |
+| K8sGPT | Analyzes Kubernetes issues using Amazon Bedrock |
 | Prometheus | Collects and stores metrics |
 | Grafana | Provides dashboards and data-source access |
-| Loki | Stores Kubernetes logs |
+| Loki | Stores logs |
 | Tempo | Stores distributed traces |
-| Thanos | Adds S3-backed long-term metrics capabilities |
+| Thanos | Provides S3-backed long-term metrics capabilities |
 | Metrics Server | Supplies Kubernetes resource metrics |
 
-## Argo CD deployment model
+## AWS Secrets Manager and External Secrets
 
-The repository uses an app-of-apps pattern:
+The External Secrets demonstration uses the following flow:
 
-1. Terraform installs Argo CD.
-2. Terraform applies the root bootstrap Application.
-3. Argo CD discovers the Application manifests under `applications/`.
-4. Each Application deploys either an upstream Helm chart or manifests from this repository.
-5. Automated synchronization provides drift correction and pruning.
+```mermaid
+flowchart TD
+    SM["AWS Secrets Manager"] --> PI["EKS Pod Identity"]
+    PI --> ESO["External Secrets Operator"]
+    ESO --> KS["Kubernetes Secret"]
+    KS --> App["Secret consumer"]
+```
 
-Applications use sync waves where ordering is important. For example, Kyverno is installed before its policy resources.
+Responsibilities are intentionally separated:
+
+- Terraform creates the AWS secret, IAM role, policy, Pod Identity association, and Pod Identity Agent.
+- Argo CD installs External Secrets Operator.
+- Argo CD deploys the `SecretStore` and `ExternalSecret`.
+- External Secrets Operator reads the AWS secret.
+- The operator creates the Kubernetes Secret.
+- The demonstration application only consumes the Kubernetes Secret.
+
+The demonstration application does not receive direct AWS permissions.
+
+Secret values and static AWS credentials are not committed to this repository.
 
 ## Kyverno policies
 
-The repository uses the newer CEL-based Kyverno policy APIs under:
-
-```text
-policies.kyverno.io/v1
-```
-
-Current policies include:
+The lab uses Kyverno CEL-based policies to evaluate Kubernetes workloads.
 
 | Policy | Action |
 |---|---|
@@ -201,11 +205,11 @@ Current policies include:
 | Require non-root execution | Audit |
 | Require dropping Linux capabilities | Audit |
 
-Policies begin in `Audit` where compatibility must be evaluated before moving them to `Deny`.
+Policies begin in `Audit` when compatibility needs to be evaluated before enforcement.
 
-## NetworkPolicies
+## Network policies
 
-The `monitoring` namespace uses default-deny policies with explicitly allowed communication paths, including:
+The `monitoring` namespace uses default-deny controls with explicitly permitted communication paths, including:
 
 - Grafana to Prometheus
 - Grafana to Loki
@@ -218,15 +222,15 @@ The `monitoring` namespace uses default-deny policies with explicitly allowed co
 - Kubernetes DNS
 - Kubernetes API access where required
 
-These policies are intended to demonstrate workload segmentation and least-privilege network access.
+These controls demonstrate workload segmentation and least-privilege network access.
 
-## Monitoring configuration
+## Observability configuration
 
-The monitoring stack is intentionally configured in a low-cost mode:
+The monitoring stack is intentionally configured for a small, temporary lab:
 
 - One Prometheus replica
-- 24-hour local retention
-- Small EBS volumes
+- Twenty-four-hour local Prometheus retention
+- Small GP3 EBS volumes
 - Loki single-binary deployment
 - Tempo local ephemeral storage
 - Alertmanager disabled
@@ -234,155 +238,137 @@ The monitoring stack is intentionally configured in a low-cost mode:
 - Thanos Compactor disabled
 - ClusterIP services instead of public load balancers
 
-These settings are appropriate for a temporary home lab, not a production baseline.
-
-## Grafana credentials
-
-Grafana reads its administrator credentials from this Kubernetes Secret:
-
-```text
-grafana-admin-credentials
-```
-
-The real password is deliberately not committed to Git.
-
-After creating or rebuilding the cluster, wait for the `monitoring` namespace and create the Secret:
-
-```bash
-kubectl wait \
-  --for=jsonpath='{.status.phase}'=Active \
-  namespace/monitoring \
-  --timeout=300s
-
-read -rsp 'Grafana admin password: ' GRAFANA_PASSWORD
-echo
-
-kubectl create secret generic grafana-admin-credentials \
-  --namespace monitoring \
-  --from-literal=admin-user=admin \
-  --from-literal=admin-password="$GRAFANA_PASSWORD" \
-  --dry-run=client \
-  -o yaml |
-kubectl apply -f -
-
-unset GRAFANA_PASSWORD
-```
-
-The Secret must be recreated whenever the EKS cluster is completely destroyed and rebuilt.
-
-Future improvement: manage the credential with AWS Secrets Manager and External Secrets Operator.
-
-## Access Grafana
-
-```bash
-kubectl port-forward \
-  service/kube-prometheus-stack-grafana \
-  --namespace monitoring \
-  3000:80
-```
-
-Open:
-
-```text
-http://localhost:3000
-```
-
-## Validation
-
-Check Argo CD applications:
-
-```bash
-kubectl get applications -n argocd
-```
-
-Check workloads:
-
-```bash
-kubectl get pods -A
-```
-
-Check Kyverno policies:
-
-```bash
-kubectl get validatingpolicies.policies.kyverno.io
-```
-
-Check policy reports:
-
-```bash
-kubectl get policyreports -A
-```
-
-Check monitoring services:
-
-```bash
-kubectl get services,endpointslices \
-  --namespace monitoring
-```
-
-Check NetworkPolicies:
-
-```bash
-kubectl get networkpolicies -A
-```
-
-## Local manifest validation
-
-Render the primary Helm releases before committing changes:
-
-```bash
-helm template kyverno \
-  kyverno/kyverno \
-  --version 3.9.1 \
-  --namespace kyverno \
-  --values apps/kyverno/values.yaml \
-  >/dev/null
-```
-
-```bash
-helm template kube-prometheus-stack \
-  prometheus-community/kube-prometheus-stack \
-  --version 87.21.0 \
-  --namespace monitoring \
-  --values apps/kube-prometheus-stack/values.yaml \
-  >/dev/null
-```
-
-```bash
-helm template tempo \
-  grafana/tempo \
-  --version 1.7.0 \
-  --namespace monitoring \
-  --values apps/tempo/values.yaml \
-  >/dev/null
-```
-
-## Security considerations
-
-This repository intentionally does not store:
-
-- AWS access keys
-- Bedrock API keys
-- Grafana passwords
-- kubeconfig files
-- Terraform state
-- Private keys
-- Static S3 credentials
-
-AWS workloads use IAM Roles for Service Accounts where applicable. Configuration such as AWS account IDs, role ARNs, regions, and bucket names may be visible, but these values are not authentication credentials.
-
-Some controls are relaxed to reduce cost and complexity in the lab. Review all values before adapting this repository for production.
+Amazon EBS volumes are Availability Zone-specific. If all nodes in a volume's zone disappear, a stateful pod may report a `volume node affinity conflict`.
 
 ## AI-assisted operations
 
-This lab includes:
+K8sGPT runs inside the cluster and uses Amazon Bedrock for AI-assisted Kubernetes analysis.
 
-- K8sGPT using Amazon Bedrock through IRSA
-- kubectl-ai local configuration examples
-- Kiro CLI for repository analysis and development workflows
+AWS access is provided through a narrowly scoped IAM role associated with the K8sGPT service account. AWS credentials are not stored in Git.
 
-Local credentials and tool sessions are not stored in this repository.
+A local `kubectl-ai` configuration example is available under:
+
+```text
+docs/kubectl-ai/config.example.yaml
+```
+
+The local configuration does not contain AWS credentials.
+
+## Security considerations
+
+This repository intentionally avoids committing:
+
+- AWS access keys
+- Bedrock credentials
+- Application passwords
+- Private keys
+- Terraform state
+- Kubernetes Secrets containing real credentials
+- Local kubeconfig files
+
+Public identifiers such as AWS account IDs, role ARNs, repository URLs, and bucket names are not credentials, but reusable configurations should parameterize them where practical.
+
+## Validation
+
+List Argo CD projects:
+
+```bash
+kubectl get appprojects -n argocd
+```
+
+List ApplicationSets:
+
+```bash
+kubectl get applicationsets -n argocd
+```
+
+Check Application health and project assignments:
+
+```bash
+kubectl get applications -n argocd \
+  -o custom-columns='NAME:.metadata.name,PROJECT:.spec.project,SYNC:.status.sync.status,HEALTH:.status.health.status' |
+sort
+```
+
+Verify the security ApplicationSet ownership:
+
+```bash
+for APP in kube-bench kyverno-policies network-policies popeye
+do
+  kubectl get application "$APP" -n argocd \
+    -o custom-columns='APP:.metadata.name,OWNER:.metadata.ownerReferences[0].name,PROJECT:.spec.project,SYNC:.status.sync.status,HEALTH:.status.health.status' \
+    --no-headers
+done
+```
+
+Check External Secrets:
+
+```bash
+kubectl get secretstore,externalsecret \
+  -n secret-demo
+```
+
+Check monitoring workloads:
+
+```bash
+kubectl get pods -n monitoring
+```
+
+Check Metrics Server:
+
+```bash
+kubectl top nodes
+kubectl top pods -A
+```
+
+## Rebuilding the lab
+
+The intended rebuild sequence is:
+
+1. Run Terraform from the infrastructure repository.
+2. Wait for EKS and Argo CD to become available.
+3. Confirm `bootstrap-root` is healthy.
+4. Allow Argo CD to create the AppProjects and Applications.
+5. Verify all Applications become `Synced/Healthy`.
+6. Perform any documented manual secret-bootstrap steps.
+7. Run the validation commands above.
+
+Argo CD automated synchronization uses:
+
+```yaml
+automated:
+  prune: true
+  selfHeal: true
+```
+
+Pruning should only be temporarily disabled during a controlled ownership migration.
+
+## Cost considerations
+
+This lab minimizes cost by using:
+
+- Small ARM-based Spot instances
+- Minimal replica counts
+- Short local metrics retention
+- Small EBS volumes
+- ClusterIP services
+- Disabled nonessential components
+- Temporary AWS Secrets Manager resources
+- On-demand Amazon Bedrock usage
+
+AWS resources should be destroyed when the lab is not being used.
 
 ## Disclaimer
 
-This repository is an educational home lab and portfolio project. It is not a production reference architecture. Security controls, availability, scaling, backup, secret management, and disaster recovery requirements should be evaluated separately for production environments.
+This repository is a learning and portfolio environment. Production use would require additional controls such as:
+
+- High availability
+- Backup and recovery testing
+- Centralized identity and access management
+- Secret rotation
+- Private cluster networking
+- Admission-policy testing
+- Alerting and incident-response integration
+- Supply-chain verification
+- Disaster recovery
+- Formal change management
