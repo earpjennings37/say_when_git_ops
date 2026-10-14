@@ -8,7 +8,7 @@ metadata:
     argocd.argoproj.io/sync-wave: "0"
 
 spec:
-  project: default
+  project: lab-ai-ops
 
   sources:
     - repoURL: https://charts.k8sgpt.ai/

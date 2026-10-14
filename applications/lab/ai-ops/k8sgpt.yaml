@@ -8,7 +8,7 @@ metadata:
     argocd.argoproj.io/sync-wave: "1"
 
 spec:
-  project: default
+  project: lab-ai-ops
 
   source:
     repoURL: https://github.com/earpjennings37/say_when_git_ops.git
