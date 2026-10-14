@@ -1,0 +1,41 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: lab-platform
+  namespace: argocd
+  labels:
+    environment: lab
+    category: platform
+spec:
+  description: Core Kubernetes platform services for the lab cluster
+
+  sourceRepos:
+    - https://github.com/earpjennings37/say_when_git_ops.git
+    - https://kubernetes-sigs.github.io/metrics-server/
+
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: kube-system
+
+  namespaceResourceWhitelist:
+    - group: ""
+      kind: Service
+
+    - group: ""
+      kind: ServiceAccount
+
+    - group: apps
+      kind: Deployment
+
+    - group: rbac.authorization.k8s.io
+      kind: RoleBinding
+
+  clusterResourceWhitelist:
+    - group: apiregistration.k8s.io
+      kind: APIService
+
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRole
+
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRoleBinding
