@@ -1,0 +1,51 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: lab-ai-ops
+  namespace: argocd
+  labels:
+    environment: lab
+    category: ai-ops
+spec:
+  description: AI-assisted Kubernetes operations for the lab cluster
+
+  sourceRepos:
+    - https://github.com/earpjennings37/say_when_git_ops.git
+    - https://charts.k8sgpt.ai/
+
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: k8sgpt-operator-system
+
+  namespaceResourceWhitelist:
+    - group: ""
+      kind: Service
+
+    - group: ""
+      kind: ServiceAccount
+
+    - group: apps
+      kind: Deployment
+
+    - group: core.k8sgpt.ai
+      kind: K8sGPT
+
+    - group: rbac.authorization.k8s.io
+      kind: Role
+
+    - group: rbac.authorization.k8s.io
+      kind: RoleBinding
+
+  clusterResourceWhitelist:
+    # Required when CreateNamespace=true is used.
+    - group: ""
+      kind: Namespace
+
+    - group: apiextensions.k8s.io
+      kind: CustomResourceDefinition
+
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRole
+
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRoleBinding
