@@ -1,0 +1,50 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: lab-security
+  namespace: argocd
+  labels:
+    environment: lab
+    category: security
+spec:
+  description: Security tooling and policy workloads for the lab cluster
+
+  # Only this GitOps repository may provide manifests.
+  sourceRepos:
+    - https://github.com/earpjennings37/say_when_git_ops.git
+
+  # Namespaces used by the four ApplicationSet-generated Applications.
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: kube-bench
+
+    - server: https://kubernetes.default.svc
+      namespace: kyverno
+
+    - server: https://kubernetes.default.svc
+      namespace: monitoring
+
+    - server: https://kubernetes.default.svc
+      namespace: popeye
+
+  # Namespaced resources required by the current applications.
+  namespaceResourceWhitelist:
+    - group: ""
+      kind: ServiceAccount
+
+    - group: batch
+      kind: CronJob
+
+    - group: networking.k8s.io
+      kind: NetworkPolicy
+
+  # Narrow list of permitted cluster-scoped resources.
+  clusterResourceWhitelist:
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRole
+
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRoleBinding
+
+    - group: policies.kyverno.io
+      kind: ValidatingPolicy
