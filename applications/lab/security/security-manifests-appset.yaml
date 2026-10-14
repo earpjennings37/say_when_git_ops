@@ -37,7 +37,7 @@ spec:
         category: security
 
     spec:
-      project: default
+      project: lab-security
 
       source:
         repoURL: https://github.com/earpjennings37/say_when_git_ops.git
