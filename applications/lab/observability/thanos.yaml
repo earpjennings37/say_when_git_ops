@@ -5,7 +5,7 @@ metadata:
   name: thanos
   namespace: argocd
 spec:
-  project: default
+  project: lab-observability
 
   sources:
     - repoURL: registry-1.docker.io/bitnamicharts
