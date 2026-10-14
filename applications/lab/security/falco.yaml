@@ -4,7 +4,7 @@ metadata:
   name: falco
   namespace: argocd
 spec:
-  project: default
+  project: lab-security
 
   sources:
     - repoURL: https://falcosecurity.github.io/charts
