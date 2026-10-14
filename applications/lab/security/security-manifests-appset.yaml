@@ -1,0 +1,72 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: lab-security-manifests
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions:
+    - missingkey=error
+
+  generators:
+    - list:
+        elements:
+          - name: kube-bench
+            namespace: kube-bench
+            path: apps/kube-bench
+
+          - name: kyverno-policies
+            namespace: kyverno
+            path: apps/kyverno/policies
+
+          - name: network-policies
+            namespace: monitoring
+            path: apps/network-policies
+
+          - name: popeye
+            namespace: popeye
+            path: apps/popeye
+
+  template:
+    metadata:
+      name: '{{ .name }}'
+      namespace: argocd
+      labels:
+        app.kubernetes.io/managed-by: applicationset
+        environment: lab
+        category: security
+
+    spec:
+      project: default
+
+      source:
+        repoURL: https://github.com/earpjennings37/say_when_git_ops.git
+        targetRevision: main
+        path: '{{ .path }}'
+
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{ .namespace }}'
+
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+
+        retry:
+          limit: 5
+          backoff:
+            duration: 10s
+            factor: 2
+            maxDuration: 3m
+
+        syncOptions:
+          - CreateNamespace=true
+          - ApplyOutOfSyncOnly=true
+
+  syncPolicy:
+    # ApplicationSet may create and update Applications, but not delete them.
+    applicationsSync: create-update
+
+    # Preserve deployed workloads if this ApplicationSet is removed.
+    preserveResourcesOnDeletion: true
