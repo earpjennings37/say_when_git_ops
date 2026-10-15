@@ -1,0 +1,80 @@
+---
+# Sources:
+# https://karpenter.sh/docs/concepts/nodepools/
+# https://karpenter.sh/docs/concepts/disruption/
+# https://karpenter.sh/docs/concepts/scheduling/
+
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: lab-arm64-spot
+  annotations:
+    # Create this after the EC2NodeClass.
+    argocd.argoproj.io/sync-wave: "1"
+
+spec:
+  template:
+    metadata:
+      labels:
+        workload-tier: karpenter
+        environment: dev
+
+    spec:
+      nodeClassRef:
+        group: karpenter.k8s.aws
+        kind: EC2NodeClass
+        name: lab-arm64
+
+      requirements:
+        # Match the cluster's existing ARM64 architecture.
+        - key: kubernetes.io/arch
+          operator: In
+          values:
+            - arm64
+
+        - key: kubernetes.io/os
+          operator: In
+          values:
+            - linux
+
+        # Use discounted EC2 Spot capacity.
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values:
+            - spot
+
+        # Permit general-purpose, compute and burstable families.
+        - key: karpenter.k8s.aws/instance-category
+          operator: In
+          values:
+            - t
+            - c
+            - m
+
+        # Avoid older instance generations.
+        - key: karpenter.k8s.aws/instance-generation
+          operator: Gt
+          values:
+            - "3"
+
+        # Prevent Karpenter from selecting unnecessarily large instances.
+        - key: karpenter.k8s.aws/instance-cpu
+          operator: In
+          values:
+            - "2"
+            - "4"
+
+  # Hard limit across all nodes created by this NodePool.
+  limits:
+    cpu: "8"
+    memory: 32Gi
+
+  disruption:
+    # Consolidate empty or underused Karpenter nodes.
+    consolidationPolicy: WhenEmptyOrUnderutilized
+    consolidateAfter: 5m
+
+    budgets:
+      - nodes: "10%"
+
+  weight: 10

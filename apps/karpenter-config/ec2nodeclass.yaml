@@ -1,0 +1,55 @@
+---
+# Sources:
+# https://karpenter.sh/docs/concepts/nodeclasses/
+# https://karpenter.sh/docs/tasks/managing-amis/
+
+apiVersion: karpenter.k8s.aws/v1
+kind: EC2NodeClass
+metadata:
+  name: lab-arm64
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+
+spec:
+  # AL2023 is also implied by the AMI alias, but keeping this
+  # explicit makes the intended bootstrap family easy to understand.
+  amiFamily: AL2023
+
+  # Pin the EKS-optimized AL2023 release.
+  amiSelectorTerms:
+    - alias: al2023@v20261012
+
+  # Pre-created by Terraform.
+  instanceProfile: KarpenterNodeInstanceProfile-say-when-east
+
+  subnetSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: say-when-east
+
+  securityGroupSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: say-when-east
+
+  # Required because this lab uses public subnets without a NAT Gateway.
+  associatePublicIPAddress: true
+
+  metadataOptions:
+    httpEndpoint: enabled
+    httpProtocolIPv6: disabled
+    httpPutResponseHopLimit: 1
+    httpTokens: required
+
+  blockDeviceMappings:
+    - deviceName: /dev/xvda
+      ebs:
+        volumeSize: 20Gi
+        volumeType: gp3
+        encrypted: true
+        deleteOnTermination: true
+
+  tags:
+    Name: say-when-east-karpenter
+    project: say-when
+    environment: dev
+    component: karpenter
+    managed-by: karpenter

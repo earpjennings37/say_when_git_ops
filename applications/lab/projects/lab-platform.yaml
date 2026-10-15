@@ -22,24 +22,28 @@ spec:
       server: https://kubernetes.default.svc
 
   clusterResourceWhitelist:
-    # Metrics Server API registration.
     - group: apiregistration.k8s.io
       kind: APIService
 
-    # Karpenter CRDs.
     - group: apiextensions.k8s.io
       kind: CustomResourceDefinition
 
-    # Karpenter and Metrics Server cluster RBAC.
     - group: rbac.authorization.k8s.io
       kind: ClusterRole
 
     - group: rbac.authorization.k8s.io
       kind: ClusterRoleBinding
 
-    # Required by CreateNamespace=true.
     - group: ""
       kind: Namespace
+
+    # Argo CD manages the Karpenter EC2 configuration.
+    - group: karpenter.k8s.aws
+      kind: EC2NodeClass
+
+    # Argo CD manages the Karpenter capacity and scheduling policy.
+    - group: karpenter.sh
+      kind: NodePool
 
   namespaceResourceWhitelist:
     - group: ""
