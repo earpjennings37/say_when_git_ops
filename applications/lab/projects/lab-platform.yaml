@@ -12,10 +12,14 @@ spec:
   sourceRepos:
     - https://github.com/earpjennings37/say_when_git_ops.git
     - https://kubernetes-sigs.github.io/metrics-server/
+    - public.ecr.aws/karpenter
 
   destinations:
-    - server: https://kubernetes.default.svc
-      namespace: kube-system
+    - namespace: kube-system
+      server: https://kubernetes.default.svc
+
+    - namespace: karpenter
+      server: https://kubernetes.default.svc
 
   namespaceResourceWhitelist:
     - group: ""
