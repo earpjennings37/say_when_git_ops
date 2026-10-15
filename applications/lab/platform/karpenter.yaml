@@ -1,0 +1,40 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: karpenter
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  project: lab-platform
+
+  sources:
+    - repoURL: public.ecr.aws/karpenter
+      chart: karpenter
+      targetRevision: 1.14.1
+      helm:
+        releaseName: karpenter
+
+        # CRDs are managed by the separate karpenter-crd Application.
+        skipCrds: true
+
+        valueFiles:
+          - $values/apps/karpenter/values.yaml
+
+    - repoURL: https://github.com/earpjennings37/say_when_git_ops.git
+      targetRevision: main
+      ref: values
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: karpenter
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
