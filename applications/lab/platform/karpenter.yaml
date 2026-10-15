@@ -5,23 +5,28 @@ metadata:
   name: karpenter
   namespace: argocd
   annotations:
+    # Install the controller after the CRD Application.
     argocd.argoproj.io/sync-wave: "-1"
+
 spec:
   project: lab-platform
 
   sources:
+    # Upstream Karpenter controller Helm chart.
     - repoURL: public.ecr.aws/karpenter
       chart: karpenter
       targetRevision: 1.14.1
+
       helm:
         releaseName: karpenter
 
-        # CRDs are managed by the separate karpenter-crd Application.
+        # The separate karpenter-crd Application manages the CRDs.
         skipCrds: true
 
         valueFiles:
           - $values/apps/karpenter/values.yaml
 
+    # This repository supplies the Helm values file.
     - repoURL: https://github.com/earpjennings37/say_when_git_ops.git
       targetRevision: main
       ref: values

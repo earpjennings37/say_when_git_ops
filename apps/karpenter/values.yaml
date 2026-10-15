@@ -1,42 +1,32 @@
 # ============================================================
 # Karpenter Controller
+#
+# AWS IAM permissions are supplied through the EKS Pod Identity
+# association created in the Terraform infrastructure repository.
+#
+# Do not add an IAM role annotation to this ServiceAccount.
 # ============================================================
 
-# One replica is sufficient for this temporary home lab.
-# Production environments should normally retain the chart's
-# highly available default of two replicas.
+# One controller replica is sufficient for this small home lab.
 replicas: 1
 
 serviceAccount:
   create: true
-
-  # Must match the Terraform EKS Pod Identity association.
   name: karpenter
 
-  # No IRSA annotation is required because this deployment
-  # uses EKS Pod Identity.
+  # EKS Pod Identity does not require the IRSA role annotation.
   annotations: {}
 
 settings:
-  # EKS cluster managed by this Karpenter controller.
+  # Must match the Terraform-managed EKS cluster name.
   clusterName: say-when-east
 
-  # Allow Karpenter to discover EKS control-plane details,
-  # including the API endpoint, through DescribeCluster.
-  # This prevents an ephemeral endpoint from being stored in Git.
-  eksControlPlane: true
-
-  # Terraform-created SQS queue receiving Spot interruption,
-  # rebalance and EC2 lifecycle events.
+  # Terraform creates this SQS queue through the Karpenter module.
+  # Karpenter uses it for Spot and EC2 interruption events.
   interruptionQueue: Karpenter-say-when-east
 
+  # The cluster has internet access through its public subnets.
   isolatedVPC: false
-  logLevel: info
-
-# The chart's default affinity prevents the Karpenter controller
-# from scheduling on nodes that Karpenter itself manages.
-nodeSelector:
-  kubernetes.io/os: linux
 
 controller:
   resources:
@@ -47,16 +37,7 @@ controller:
       cpu: 500m
       memory: 512Mi
 
-# Enable later after confirming Prometheus discovers resources
-# in the karpenter namespace.
+# Leave disabled initially. It can be enabled later after confirming
+# that the Prometheus Operator discovers monitors in this namespace.
 serviceMonitor:
   enabled: false
-
-podDisruptionBudget:
-  name: karpenter
-  maxUnavailable: 1
-
-podSecurityContext:
-  fsGroup: 65532
-  seccompProfile:
-    type: RuntimeDefault
