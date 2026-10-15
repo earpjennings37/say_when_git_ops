@@ -4,29 +4,37 @@
 # Copy it to ~/.config/kubectl-ai/config.yaml before using kubectl-ai.
 #
 # AWS credentials are intentionally not stored here.
-# kubectl-ai uses the normal AWS SDK credential chain.
+# kubectl-ai uses the standard AWS SDK credential chain.
+#
+# Set the AWS Region separately:
+# export AWS_REGION=us-east-1
+# export AWS_DEFAULT_REGION=us-east-1
 
 # Amazon Bedrock provider
 llmProvider: bedrock
 
-# Current Anthropic Claude US cross-region inference profile
+# Anthropic Claude US cross-region inference profile
 model: us.anthropic.claude-sonnet-4-6
-
-# Use the current user's Kubernetes configuration
-kubeconfig: ~/.kube/config
-
-# Require approval before commands are executed
-skipPermissions: false
 
 # Claude supports native Bedrock tool use.
 enableToolUseShim: false
 
-# Keep this low while the kubectl-ai Bedrock command-loop bug is open.
+# Use the current user's Kubernetes configuration.
+kubeconfig: ~/.kube/config
+
+# Require approval for modifying or potentially unsafe commands.
+skipPermissions: false
+
+# Limit unexpected command loops and Bedrock usage.
+# Increase temporarily for complex investigations if necessary.
 maxIterations: 3
 
-# Use interactive terminal output
+# Use interactive terminal output so commands can be reviewed.
 quiet: false
 uiType: terminal
 
-# Remove temporary working files after each session
+# Remove temporary working files after each session.
 removeWorkdir: true
+
+# Write diagnostic traces here when troubleshooting.
+tracePath: /tmp/kubectl-ai-trace.txt
