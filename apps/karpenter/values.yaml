@@ -7,6 +7,11 @@
 # Do not add an IAM role annotation to this ServiceAccount.
 # ============================================================
 
+# Sources:
+# https://github.com/aws/karpenter-provider-aws/blob/v1.14.1/charts/karpenter/values.yaml
+# https://karpenter.sh/docs/getting-started/getting-started-with-karpenter/
+# https://docs.aws.amazon.com/eks/latest/userguide/pod-identities.html
+
 # One controller replica is sufficient for this small home lab.
 replicas: 1
 

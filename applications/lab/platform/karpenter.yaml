@@ -1,4 +1,10 @@
 ---
+# Sources:
+# https://karpenter.sh/docs/getting-started/getting-started-with-karpenter/
+# https://github.com/aws/karpenter-provider-aws/tree/v1.14.1/charts/karpenter
+# https://argo-cd.readthedocs.io/en/stable/user-guide/multiple_sources/
+# https://argo-cd.readthedocs.io/en/stable/user-guide/sync-waves/
+
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
