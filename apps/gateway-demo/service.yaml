@@ -1,0 +1,32 @@
+---
+# Purpose:
+# Provide a stable internal backend address for the demonstration
+# Deployment. The HTTPRoute added in Phase 3B will reference this
+# Service on port 8080.
+#
+# Source:
+# https://kubernetes.io/docs/concepts/services-networking/service/
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-demo
+  namespace: gateway-demo
+
+  labels:
+    app.kubernetes.io/name: gateway-demo
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: gateway-api-lab
+    app.kubernetes.io/managed-by: argocd
+
+spec:
+  type: ClusterIP
+
+  selector:
+    app.kubernetes.io/name: gateway-demo
+
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8080
+      targetPort: http

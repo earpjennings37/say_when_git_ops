@@ -1,0 +1,39 @@
+---
+# Purpose:
+# Deploy the demonstration workload independently from the
+# platform-owned Gateway infrastructure.
+#
+# Sources:
+# https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/
+# https://argo-cd.readthedocs.io/en/stable/user-guide/sync-waves/
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gateway-demo
+  namespace: argocd
+  annotations:
+    # The Envoy Gateway controller is wave -1.
+    # Platform Gateway configuration is wave 0.
+    # The workload follows in wave 1.
+    argocd.argoproj.io/sync-wave: "1"
+
+spec:
+  project: lab-workloads
+
+  source:
+    repoURL: https://github.com/earpjennings37/say_when_git_ops.git
+    targetRevision: main
+    path: apps/gateway-demo
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gateway-demo
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+
+    syncOptions:
+      - ServerSideApply=true
