@@ -1,0 +1,37 @@
+---
+# This Application manages the platform-owned Gateway API
+# resources used by the demonstration environment.
+#
+# Source:
+# https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: envoy-gateway-config
+  namespace: argocd
+  annotations:
+    # Envoy Gateway itself was installed in wave -1.
+    # Platform configuration follows in wave 0.
+    argocd.argoproj.io/sync-wave: "0"
+
+spec:
+  project: lab-platform
+
+  source:
+    repoURL: https://github.com/earpjennings37/say_when_git_ops.git
+    targetRevision: main
+    path: apps/envoy-gateway-config
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gateway-demo
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

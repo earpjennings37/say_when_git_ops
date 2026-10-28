@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gateway-demo
+  labels:
+    app.kubernetes.io/name: gateway-demo
+    app.kubernetes.io/part-of: gateway-api-lab
+    app.kubernetes.io/managed-by: argocd
+    environment: lab
+
+    # Report restricted Pod Security Standard violations.
+    # These are warnings rather than deployment-blocking enforcement.
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/warn: restricted

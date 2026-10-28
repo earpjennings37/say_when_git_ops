@@ -24,6 +24,9 @@ spec:
 
     - namespace: envoy-gateway-system
       server: https://kubernetes.default.svc
+    
+    - namespace: gateway-demo
+      server: https://kubernetes.default.svc
 
   clusterResourceWhitelist:
     - group: apiregistration.k8s.io
