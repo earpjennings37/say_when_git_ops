@@ -108,3 +108,7 @@ spec:
     # EnvoyProxy is an Envoy Gateway configuration resource.
     - group: gateway.envoyproxy.io
       kind: EnvoyProxy
+    
+    # Gateway defines the platform-owned network listener.
+    - group: gateway.networking.k8s.io
+      kind: Gateway

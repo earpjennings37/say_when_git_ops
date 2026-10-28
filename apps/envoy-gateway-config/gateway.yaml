@@ -1,0 +1,52 @@
+---
+# Purpose:
+# Create the platform-owned HTTP listener and instruct Envoy
+# Gateway to generate an internal Envoy data plane.
+#
+# Sources:
+# https://gateway-api.sigs.k8s.io/api-types/gateway/
+# https://gateway-api.sigs.k8s.io/guides/getting-started/simple-gateway/
+# https://gateway.envoyproxy.io/docs/tasks/operations/customize-envoyproxy/
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: gateway-demo
+  namespace: gateway-demo
+  annotations:
+    # GatewayClass and EnvoyProxy were created in wave -1.
+    argocd.argoproj.io/sync-wave: "0"
+
+  labels:
+    app.kubernetes.io/name: gateway-demo
+    app.kubernetes.io/component: gateway
+    app.kubernetes.io/part-of: gateway-api-lab
+    app.kubernetes.io/managed-by: argocd
+
+spec:
+  # Select the GatewayClass created in Phase 2B.
+  gatewayClassName: envoy
+
+  # Use the internal ClusterIP proxy configuration created
+  # in Phase 2B.
+  infrastructure:
+    parametersRef:
+      group: gateway.envoyproxy.io
+      kind: EnvoyProxy
+      name: gateway-demo-proxy
+
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      hostname: gateway-demo.local
+
+      # Initially, only HTTPRoutes from the gateway-demo
+      # namespace may attach to this listener.
+      allowedRoutes:
+        namespaces:
+          from: Same
+
+        kinds:
+          - group: gateway.networking.k8s.io
+            kind: HTTPRoute
