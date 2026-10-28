@@ -1,0 +1,41 @@
+---
+# Sources:
+# https://gateway.envoyproxy.io/docs/install/install-argocd/
+# https://argo-cd.readthedocs.io/en/stable/user-guide/multiple_sources/
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: envoy-gateway
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+
+spec:
+  project: lab-platform
+
+  sources:
+    - repoURL: docker.io/envoyproxy
+      chart: gateway-helm
+      targetRevision: v1.9.2
+      helm:
+        releaseName: envoy-gateway
+        valueFiles:
+          - $values/apps/envoy-gateway/values.yaml
+
+    - repoURL: https://github.com/earpjennings37/say_when_git_ops.git
+      targetRevision: main
+      ref: values
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: envoy-gateway-system
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

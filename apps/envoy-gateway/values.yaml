@@ -1,0 +1,59 @@
+# Sources:
+# https://gateway.envoyproxy.io/docs/install/install-argocd/
+# https://gateway.envoyproxy.io/docs/install/gateway-helm-api/
+
+# Install Gateway API and Envoy Gateway CRDs.
+crds:
+  enabled: true
+
+deployment:
+  replicas: 1
+
+  envoyGateway:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 250m
+        memory: 256Mi
+
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsGroup: 65532
+      runAsUser: 65532
+      seccompProfile:
+        type: RuntimeDefault
+
+  pod:
+    securityContext:
+      runAsNonRoot: true
+      runAsGroup: 65532
+      runAsUser: 65532
+      fsGroup: 65532
+      seccompProfile:
+        type: RuntimeDefault
+
+service:
+  type: ClusterIP
+
+hpa:
+  enabled: false
+
+config:
+  envoyGateway:
+    gateway:
+      controllerName: gateway.envoyproxy.io/gatewayclass-controller
+
+    provider:
+      type: Kubernetes
+
+    logging:
+      level:
+        default: info

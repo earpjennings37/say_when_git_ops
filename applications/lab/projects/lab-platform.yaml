@@ -13,12 +13,16 @@ spec:
     - https://github.com/earpjennings37/say_when_git_ops.git
     - https://kubernetes-sigs.github.io/metrics-server/
     - public.ecr.aws/karpenter
+    - docker.io/envoyproxy
 
   destinations:
     - namespace: kube-system
       server: https://kubernetes.default.svc
 
     - namespace: karpenter
+      server: https://kubernetes.default.svc
+
+    - namespace: envoy-gateway-system
       server: https://kubernetes.default.svc
 
   clusterResourceWhitelist:
@@ -28,6 +32,18 @@ spec:
     - group: apiextensions.k8s.io
       kind: CustomResourceDefinition
 
+    - group: admissionregistration.k8s.io
+      kind: ValidatingAdmissionPolicy
+
+    - group: admissionregistration.k8s.io
+      kind: ValidatingAdmissionPolicyBinding
+
+    - group: admissionregistration.k8s.io
+      kind: ValidatingWebhookConfiguration
+
+    - group: admissionregistration.k8s.io
+      kind: MutatingWebhookConfiguration
+
     - group: rbac.authorization.k8s.io
       kind: ClusterRole
 
@@ -36,6 +52,15 @@ spec:
 
     - group: ""
       kind: Namespace
+
+    - group: gateway.networking.k8s.io
+      kind: GatewayClass
+
+    - group: karpenter.k8s.aws
+      kind: EC2NodeClass
+
+    - group: karpenter.sh
+      kind: NodePool
 
     # Argo CD manages the Karpenter EC2 configuration.
     - group: karpenter.k8s.aws
@@ -47,6 +72,12 @@ spec:
 
   namespaceResourceWhitelist:
     - group: ""
+      kind: ConfigMap
+
+    - group: ""
+      kind: Secret
+
+    - group: ""
       kind: Service
 
     - group: ""
@@ -54,6 +85,9 @@ spec:
 
     - group: apps
       kind: Deployment
+
+    - group: batch
+      kind: Job
 
     - group: rbac.authorization.k8s.io
       kind: Role
