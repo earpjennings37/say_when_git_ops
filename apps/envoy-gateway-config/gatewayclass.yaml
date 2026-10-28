@@ -1,0 +1,18 @@
+---
+# Purpose:
+# Select Envoy Gateway as the implementation responsible for
+# Gateway resources that specify gatewayClassName: envoy.
+#
+# Sources:
+# https://gateway-api.sigs.k8s.io/api-types/gatewayclass/
+# https://gateway.envoyproxy.io/docs/tasks/quickstart/
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: envoy
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+
+spec:
+  controllerName: gateway.envoyproxy.io/gatewayclass-controller

@@ -73,6 +73,10 @@ spec:
     - group: karpenter.sh
       kind: NodePool
 
+    # GatewayClass is cluster-scoped and selects the controller.
+    - group: gateway.networking.k8s.io
+      kind: GatewayClass
+
   namespaceResourceWhitelist:
     - group: ""
       kind: ConfigMap
@@ -100,3 +104,7 @@ spec:
 
     - group: policy
       kind: PodDisruptionBudget
+    
+    # EnvoyProxy is an Envoy Gateway configuration resource.
+    - group: gateway.envoyproxy.io
+      kind: EnvoyProxy

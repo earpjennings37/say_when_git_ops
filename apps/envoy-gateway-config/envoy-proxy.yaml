@@ -1,0 +1,39 @@
+---
+# Purpose:
+# Configure the Envoy data-plane resources that will eventually
+# be created for the gateway-demo Gateway.
+#
+# The ClusterIP service prevents the lab from creating a billable
+# AWS Network Load Balancer.
+#
+# Sources:
+# https://gateway.envoyproxy.io/docs/tasks/operations/customize-envoyproxy/
+# https://gateway.envoyproxy.io/docs/api/extension_types/
+
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+metadata:
+  name: gateway-demo-proxy
+  namespace: gateway-demo
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+
+spec:
+  provider:
+    type: Kubernetes
+
+    kubernetes:
+      envoyService:
+        type: ClusterIP
+
+      envoyDeployment:
+        replicas: 1
+
+        container:
+          resources:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
