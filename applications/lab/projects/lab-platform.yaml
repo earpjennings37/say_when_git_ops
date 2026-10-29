@@ -115,3 +115,7 @@ spec:
     # Gateway defines the platform-owned network listener.
     - group: gateway.networking.k8s.io
       kind: Gateway
+    
+    # Application teams may attach HTTP routes to permitted Gateways.
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute

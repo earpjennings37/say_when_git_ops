@@ -1,0 +1,51 @@
+---
+# Purpose:
+# Attach the gateway-demo workload to the platform-owned Gateway.
+#
+# Traffic flow:
+# gateway-demo.local/*
+#   -> Gateway/gateway-demo
+#   -> Service/gateway-demo:8080
+#
+# Sources:
+# https://gateway-api.sigs.k8s.io/api-types/httproute/
+# https://gateway-api.sigs.k8s.io/guides/http-routing/
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: gateway-demo
+  namespace: gateway-demo
+
+  labels:
+    app.kubernetes.io/name: gateway-demo
+    app.kubernetes.io/component: route
+    app.kubernetes.io/part-of: gateway-api-lab
+    app.kubernetes.io/managed-by: argocd
+
+spec:
+  # Attach specifically to the "http" listener on the
+  # platform-owned Gateway.
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: gateway-demo
+      sectionName: http
+
+  # This must overlap with the hostname configured on the
+  # Gateway listener.
+  hostnames:
+    - gateway-demo.local
+
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+
+      backendRefs:
+        - group: ""
+          kind: Service
+          name: gateway-demo
+          port: 8080
+          weight: 1
