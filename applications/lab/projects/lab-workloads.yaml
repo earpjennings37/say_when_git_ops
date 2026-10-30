@@ -7,18 +7,26 @@ metadata:
     environment: lab
     category: workloads
 spec:
-  description: Demonstration application workloads for the lab cluster
-
   sourceRepos:
     - https://github.com/earpjennings37/say_when_git_ops.git
 
   destinations:
-    - server: https://kubernetes.default.svc
-      namespace: secret-demo
+    - namespace: secret-demo
+      server: https://kubernetes.default.svc
+
+    - namespace: gateway-demo
+      server: https://kubernetes.default.svc
+
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
 
   namespaceResourceWhitelist:
     - group: apps
       kind: Deployment
+
+    - group: ""
+      kind: Service
 
     - group: external-secrets.io
       kind: ExternalSecret
@@ -26,8 +34,5 @@ spec:
     - group: external-secrets.io
       kind: SecretStore
 
-  clusterResourceWhitelist:
-    # Required if the Applications use CreateNamespace=true
-    # during a new cluster deployment.
-    - group: ""
-      kind: Namespace
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
