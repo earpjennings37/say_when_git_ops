@@ -51,6 +51,107 @@ jobs:
       - name: Validate YAML files
         run: yamllint -c .yamllint.yaml applications apps bootstrap
 
+  helm-render:
+    name: Helm render - ${{ matrix.name }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: trivy-operator
+            repository: https://aquasecurity.github.io/helm-charts/
+            chart: trivy-operator
+            version: 0.35.0
+            values: apps/trivy-operator/values.yaml
+            namespace: trivy-system
+
+          - name: falco
+            repository: https://falcosecurity.github.io/charts
+            chart: falco
+            version: 9.1.0
+            values: apps/falco/values.yaml
+            namespace: falco
+
+          - name: kyverno
+            repository: https://kyverno.github.io/kyverno/
+            chart: kyverno
+            version: 3.9.1
+            values: apps/kyverno/values.yaml
+            namespace: kyverno
+
+          - name: external-secrets
+            repository: https://charts.external-secrets.io
+            chart: external-secrets
+            version: 2.12.0
+            values: apps/external-secrets/values.yaml
+            namespace: external-secrets
+
+          - name: k8sgpt-operator
+            repository: https://charts.k8sgpt.ai/
+            chart: k8sgpt-operator
+            version: 0.2.29
+            values: apps/k8sgpt-operator/values.yaml
+            namespace: k8sgpt-operator-system
+
+          - name: metrics-server
+            repository: https://kubernetes-sigs.github.io/metrics-server/
+            chart: metrics-server
+            version: 3.12.0
+            values: apps/metrics-server/values.yaml
+            namespace: kube-system
+
+          - name: kube-prometheus-stack
+            repository: https://prometheus-community.github.io/helm-charts
+            chart: kube-prometheus-stack
+            version: 87.21.0
+            values: apps/kube-prometheus-stack/values.yaml
+            namespace: monitoring
+
+          - name: loki
+            repository: https://grafana.github.io/helm-charts
+            chart: loki
+            version: 6.6.2
+            values: apps/loki/values.yaml
+            namespace: monitoring
+
+          - name: tempo
+            repository: https://grafana.github.io/helm-charts
+            chart: tempo
+            version: 1.7.0
+            values: apps/tempo/values.yaml
+            namespace: monitoring
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Install Helm
+        uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1
+        with:
+          version: v3.22.1
+
+      - name: Display Helm version
+        run: helm version --short
+
+      - name: Render chart
+        run: |
+          helm template \
+            "${{ matrix.name }}" \
+            "${{ matrix.chart }}" \
+            --repo "${{ matrix.repository }}" \
+            --version "${{ matrix.version }}" \
+            --values "${{ matrix.values }}" \
+            --namespace "${{ matrix.namespace }}" \
+            --kube-version 1.31.0 \
+            --include-crds \
+            > "/tmp/${{ matrix.name }}-rendered.yaml"
+
+          test -s "/tmp/${{ matrix.name }}-rendered.yaml"
+
+          echo "Successfully rendered ${{ matrix.name }}"
+
   kubeconform:
     name: Kubernetes schema validation
     runs-on: ubuntu-24.04
