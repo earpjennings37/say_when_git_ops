@@ -24,7 +24,7 @@ spec:
 
     - namespace: envoy-gateway-system
       server: https://kubernetes.default.svc
-    
+
     - namespace: gateway-demo
       server: https://kubernetes.default.svc
 
@@ -104,15 +104,15 @@ spec:
 
     - group: policy
       kind: PodDisruptionBudget
-    
+
     # EnvoyProxy is an Envoy Gateway configuration resource.
     - group: gateway.envoyproxy.io
       kind: EnvoyProxy
-    
+
     # Gateway defines the platform-owned network listener.
     - group: gateway.networking.k8s.io
       kind: Gateway
-    
+
     # Application teams may attach HTTP routes to permitted Gateways.
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
