@@ -152,6 +152,88 @@ jobs:
 
           echo "Successfully rendered ${{ matrix.name }}"
 
+  helm-oci-render:
+    name: Helm OCI render - ${{ matrix.name }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: karpenter-crd
+            chart: oci://public.ecr.aws/karpenter/karpenter-crd
+            version: 1.14.1
+            values: ""
+            namespace: karpenter
+
+          - name: karpenter
+            chart: oci://public.ecr.aws/karpenter/karpenter
+            version: 1.14.1
+            values: apps/karpenter/values.yaml
+            namespace: karpenter
+
+          - name: envoy-gateway-crds
+            chart: oci://docker.io/envoyproxy/gateway-crds-helm
+            version: v1.6.7
+            values: ""
+            namespace: envoy-gateway-system
+
+          - name: envoy-gateway
+            chart: oci://docker.io/envoyproxy/gateway-helm
+            version: v1.6.7
+            values: apps/envoy-gateway/values.yaml
+            namespace: envoy-gateway-system
+
+          - name: thanos
+            chart: oci://registry-1.docker.io/bitnamicharts/thanos
+            version: 17.3.1
+            values: apps/thanos/values.yaml
+            namespace: monitoring
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Install Helm
+        uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1
+        with:
+          version: v3.22.1
+
+      - name: Render OCI chart
+        shell: bash
+        run: |
+          HELM_ARGS=(
+            template
+            "${{ matrix.name }}"
+            "${{ matrix.chart }}"
+            --version "${{ matrix.version }}"
+            --namespace "${{ matrix.namespace }}"
+            --kube-version 1.31.0
+            --include-crds
+          )
+
+          if [[ -n "${{ matrix.values }}" ]]; then
+            HELM_ARGS+=(
+              --values "${{ matrix.values }}"
+            )
+          fi
+
+          if [[ "${{ matrix.name }}" == "envoy-gateway-crds" ]]; then
+            HELM_ARGS+=(
+              --set crds.envoyGateway.enabled=true
+              --set crds.gatewayAPI.enabled=true
+              --set crds.gatewayAPI.channel=standard
+            )
+          fi
+
+          helm "${HELM_ARGS[@]}" \
+            > "/tmp/${{ matrix.name }}-rendered.yaml"
+
+          test -s "/tmp/${{ matrix.name }}-rendered.yaml"
+
+          echo "Successfully rendered ${{ matrix.name }}"
+
   kubeconform:
     name: Kubernetes schema validation
     runs-on: ubuntu-24.04
