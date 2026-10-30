@@ -50,3 +50,36 @@ jobs:
 
       - name: Validate YAML files
         run: yamllint -c .yamllint.yaml applications apps bootstrap
+
+  kubeconform:
+    name: Kubernetes schema validation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Install Kubeconform
+        run: |
+          mkdir -p "$RUNNER_TEMP/bin"
+          GOBIN="$RUNNER_TEMP/bin" \
+            go install github.com/yannh/kubeconform/cmd/kubeconform@v0.6.7
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+
+      - name: Display Kubeconform version
+        run: kubeconform -v
+
+      - name: Validate Kubernetes manifests
+        run: |
+          find applications apps bootstrap \
+            -type f \
+            \( -name '*.yaml' -o -name '*.yml' \) \
+            ! -name 'values.yaml' \
+            -print0 |
+          xargs -0 kubeconform \
+            -strict \
+            -summary \
+            -output pretty \
+            -ignore-missing-schemas \
+            -kubernetes-version 1.31.0
