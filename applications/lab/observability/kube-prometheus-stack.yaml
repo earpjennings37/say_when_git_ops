@@ -51,4 +51,3 @@ spec:
       - ServerSideApply=true
       - Replace=true
       - RespectIgnoreDifferences=true
-
