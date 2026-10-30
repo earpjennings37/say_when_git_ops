@@ -1,3 +1,15 @@
+---
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+
+metadata:
+  name: disallow-privilege-escalation
+  annotations:
+    policies.kyverno.io/title: Disallow Privilege Escalation
+    policies.kyverno.io/category: Pod Security Standards
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/subject: Pod
+
 spec:
   validationActions:
     - Deny
