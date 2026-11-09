@@ -1,0 +1,43 @@
+---
+# Argo Rollouts controller configuration
+#
+# Sources:
+# https://github.com/argoproj/argo-helm/tree/main/charts/argo-rollouts
+# https://argo-rollouts.readthedocs.io/en/stable/installation/
+
+# Install and update the Rollout, AnalysisTemplate,
+# AnalysisRun and Experiment CRDs.
+installCRDs: true
+
+# Keep the CRDs if the Helm release is removed.
+# This helps prevent accidental deletion of Rollout resources.
+keepCRDs: true
+
+# Watch Rollout resources across the cluster.
+clusterInstall: true
+
+# One controller replica is sufficient for this home lab.
+replicas: 1
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+# Start without the optional dashboard.
+# We can use the kubectl plugin and Argo CD initially.
+dashboard:
+  enabled: false
+
+# Keep logging useful without excessive noise.
+logging:
+  level: info
+  kloglevel: "0"
+
+# Disable provider-specific traffic-routing permissions that
+# are not currently required. Gateway API can be enabled later.
+providerRBAC:
+  enabled: false
