@@ -123,6 +123,13 @@ jobs:
             values: apps/tempo/values.yaml
             namespace: monitoring
 
+          - name: argo-rollouts
+            repository: https://argoproj.github.io/argo-helm
+            chart: argo-rollouts
+            version: 2.43.11
+            values: apps/argo-rollouts/values.yaml
+            namespace: argo-rollouts
+
     steps:
       - name: Check out repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
