@@ -1,0 +1,105 @@
+---
+# Sources:
+# https://argo-rollouts.readthedocs.io/en/stable/getting-started/
+# https://argo-rollouts.readthedocs.io/en/stable/features/canary/
+
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: rollouts-demo
+  namespace: rollouts-demo
+  labels:
+    app.kubernetes.io/name: rollouts-demo
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: argo-rollouts-lab
+    app.kubernetes.io/managed-by: argocd
+
+spec:
+  replicas: 5
+  revisionHistoryLimit: 3
+
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: rollouts-demo
+
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: rollouts-demo
+        app.kubernetes.io/component: backend
+        app.kubernetes.io/part-of: argo-rollouts-lab
+        app.kubernetes.io/managed-by: argocd
+
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+
+      containers:
+        - name: rollouts-demo
+          image: argoproj/rollouts-demo:blue
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 50m
+              memory: 32Mi
+
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 2
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+
+  strategy:
+    canary:
+      maxSurge: 1
+      maxUnavailable: 0
+
+      steps:
+        # Run one new Pod alongside four stable Pods.
+        - setWeight: 20
+
+        # Wait for manual approval.
+        - pause: {}
+
+        # Continue automatically after approval.
+        - setWeight: 40
+        - pause:
+            duration: 10s
+
+        - setWeight: 60
+        - pause:
+            duration: 10s
+
+        - setWeight: 80
+        - pause:
+            duration: 10s

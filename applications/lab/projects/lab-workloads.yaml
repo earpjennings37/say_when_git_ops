@@ -17,6 +17,9 @@ spec:
     - namespace: gateway-demo
       server: https://kubernetes.default.svc
 
+    - namespace: rollouts-demo
+      server: https://kubernetes.default.svc
+
   clusterResourceWhitelist:
     - group: ""
       kind: Namespace
@@ -36,3 +39,6 @@ spec:
 
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
+    
+    - group: argoproj.io
+      kind: Rollout

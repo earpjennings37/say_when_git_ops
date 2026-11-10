@@ -1,0 +1,26 @@
+---
+# Source:
+# https://argo-rollouts.readthedocs.io/en/stable/getting-started/
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: rollouts-demo
+  namespace: rollouts-demo
+  labels:
+    app.kubernetes.io/name: rollouts-demo
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: argo-rollouts-lab
+    app.kubernetes.io/managed-by: argocd
+
+spec:
+  selector:
+    app.kubernetes.io/name: rollouts-demo
+
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
+
+  type: ClusterIP
