@@ -39,6 +39,6 @@ spec:
 
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
-    
+
     - group: argoproj.io
       kind: Rollout
