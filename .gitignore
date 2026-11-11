@@ -83,3 +83,6 @@ crash.log
 
 # Local kubectl-ai configuration
 .config/
+
+# Local CLI binaries
+kubectl-argo-rollouts-*

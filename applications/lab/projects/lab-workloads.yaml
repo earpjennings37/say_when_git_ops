@@ -47,3 +47,4 @@ spec:
 
     - group: argoproj.io
       kind: Rollout
+      
