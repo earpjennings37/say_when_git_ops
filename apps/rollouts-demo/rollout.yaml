@@ -46,7 +46,7 @@ spec:
 
       containers:
         - name: rollouts-demo
-          image: argoproj/rollouts-demo:yellow
+          image: argoproj/rollouts-demo:automatic-rollback-test
           imagePullPolicy: IfNotPresent
 
           ports:
