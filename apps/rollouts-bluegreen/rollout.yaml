@@ -47,7 +47,7 @@ spec:
 
       containers:
         - name: rollouts-bluegreen
-          image: argoproj/rollouts-demo:blue
+          image: argoproj/rollouts-demo:green
           imagePullPolicy: IfNotPresent
 
           ports:
