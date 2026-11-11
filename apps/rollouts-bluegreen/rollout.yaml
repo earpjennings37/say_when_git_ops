@@ -104,4 +104,3 @@ spec:
 
       # Keep the previous version alive briefly after promotion.
       scaleDownDelaySeconds: 30
-      
