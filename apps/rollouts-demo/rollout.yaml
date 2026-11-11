@@ -18,6 +18,12 @@ spec:
   replicas: 5
   revisionHistoryLimit: 3
 
+  # A release must demonstrate progress within two minutes.
+  progressDeadlineSeconds: 120
+
+  # Automatically abort the new release when the deadline expires.
+  progressDeadlineAbort: true
+
   selector:
     matchLabels:
       app.kubernetes.io/name: rollouts-demo
