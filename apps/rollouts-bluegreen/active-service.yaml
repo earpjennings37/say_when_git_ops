@@ -1,0 +1,26 @@
+---
+# The active Service represents the production endpoint.
+# Argo Rollouts modifies its selector during promotion.
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: rollouts-bluegreen-active
+  namespace: rollouts-bluegreen
+  labels:
+    app.kubernetes.io/name: rollouts-bluegreen
+    app.kubernetes.io/component: active-service
+    app.kubernetes.io/part-of: argo-rollouts-lab
+    app.kubernetes.io/managed-by: argocd
+
+spec:
+  type: ClusterIP
+
+  selector:
+    app.kubernetes.io/name: rollouts-bluegreen
+
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP

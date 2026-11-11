@@ -1,3 +1,4 @@
+---
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
@@ -6,6 +7,7 @@ metadata:
   labels:
     environment: lab
     category: workloads
+
 spec:
   sourceRepos:
     - https://github.com/earpjennings37/say_when_git_ops.git
@@ -18,6 +20,9 @@ spec:
       server: https://kubernetes.default.svc
 
     - namespace: rollouts-demo
+      server: https://kubernetes.default.svc
+
+    - namespace: rollouts-bluegreen
       server: https://kubernetes.default.svc
 
   clusterResourceWhitelist:

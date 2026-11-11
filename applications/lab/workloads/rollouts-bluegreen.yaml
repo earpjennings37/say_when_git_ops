@@ -1,0 +1,62 @@
+---
+# Sources:
+# https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/
+# https://argo-cd.readthedocs.io/en/stable/user-guide/diffing/
+# https://argo-cd.readthedocs.io/en/stable/user-guide/sync-options/
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: rollouts-bluegreen
+  namespace: argocd
+  annotations:
+    # Apply this after the AppProject destination update.
+    argocd.argoproj.io/sync-wave: "1"
+  labels:
+    environment: lab
+    category: workloads
+
+spec:
+  project: lab-workloads
+
+  source:
+    repoURL: https://github.com/earpjennings37/say_when_git_ops.git
+    targetRevision: main
+    path: apps/rollouts-bluegreen
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: rollouts-bluegreen
+
+  # Argo Rollouts dynamically adds and changes this selector.
+  # Argo CD must not remove it during self-healing.
+  ignoreDifferences:
+    - group: ""
+      kind: Service
+      name: rollouts-bluegreen-active
+      namespace: rollouts-bluegreen
+      jsonPointers:
+        - /spec/selector/rollouts-pod-template-hash
+
+    - group: ""
+      kind: Service
+      name: rollouts-bluegreen-preview
+      namespace: rollouts-bluegreen
+      jsonPointers:
+        - /spec/selector/rollouts-pod-template-hash
+
+  syncPolicy:
+    managedNamespaceMetadata:
+      labels:
+        app.kubernetes.io/name: rollouts-bluegreen
+        app.kubernetes.io/part-of: argo-rollouts-lab
+        app.kubernetes.io/managed-by: argocd
+
+    automated:
+      prune: true
+      selfHeal: true
+
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - RespectIgnoreDifferences=true
