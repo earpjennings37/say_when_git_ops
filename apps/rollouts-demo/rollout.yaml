@@ -30,14 +30,11 @@ spec:
         app.kubernetes.io/part-of: argo-rollouts-lab
         app.kubernetes.io/managed-by: argocd
 
-  spec:
-    template:
-      spec:
-        securityContext:
-          runAsNonRoot: true
-          runAsUser: 1000
-          runAsGroup: 1000
-
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
         seccompProfile:
           type: RuntimeDefault
 
