@@ -40,7 +40,7 @@ spec:
 
       containers:
         - name: rollouts-demo
-          image: argoproj/rollouts-demo:yellow
+          image: argoproj/rollouts-demo:does-not-exist
           imagePullPolicy: IfNotPresent
 
           ports:
