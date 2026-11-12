@@ -151,7 +151,7 @@ jobs:
             --version "${{ matrix.version }}" \
             --values "${{ matrix.values }}" \
             --namespace "${{ matrix.namespace }}" \
-            --kube-version 1.31.0 \
+            --kube-version 1.35.0 \
             --include-crds \
             > "/tmp/${{ matrix.name }}-rendered.yaml"
 
@@ -216,7 +216,7 @@ jobs:
             "${{ matrix.chart }}"
             --version "${{ matrix.version }}"
             --namespace "${{ matrix.namespace }}"
-            --kube-version 1.31.0
+            --kube-version 1.35.0
             --include-crds
           )
 
@@ -295,4 +295,4 @@ jobs:
             -summary \
             -output pretty \
             -ignore-missing-schemas \
-            -kubernetes-version 1.31.0
+            -kubernetes-version 1.35.0

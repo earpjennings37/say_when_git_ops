@@ -60,15 +60,6 @@ spec:
     - group: ""
       kind: Namespace
 
-    - group: gateway.networking.k8s.io
-      kind: GatewayClass
-
-    - group: karpenter.k8s.aws
-      kind: EC2NodeClass
-
-    - group: karpenter.sh
-      kind: NodePool
-
     # Argo CD manages the Karpenter EC2 configuration.
     - group: karpenter.k8s.aws
       kind: EC2NodeClass
