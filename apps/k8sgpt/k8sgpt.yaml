@@ -33,6 +33,7 @@ spec:
     anonymized: true
     language: english
     maxTokens: "2048"
+    topk: "50"
 
     backOff:
       enabled: true
