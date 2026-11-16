@@ -10,6 +10,7 @@ crash.*.log
 # Terraform plans
 *.tfplan
 *.plan
+tfplan
 
 # Local-only variable files (never commit secrets)
 *.tfvars
@@ -74,12 +75,6 @@ Thumbs.db
 # ----------------------------------------
 venv/
 .env/
-# Terraform local files
-*.tfstate
-*.tfstate.*
-.terraform/
-tfplan
-crash.log
 
 # Local kubectl-ai configuration
 .config/
