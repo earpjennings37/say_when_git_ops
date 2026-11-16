@@ -4,6 +4,8 @@ kind: AppProject
 metadata:
   name: lab-workloads
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-10"
   labels:
     environment: lab
     category: workloads
