@@ -1,0 +1,57 @@
+---
+# Purpose:
+# Fence for the Say When cleanup app (Cluster App series, Fall #2+).
+# The app may only come from this Git repo, only deploy into the
+# say-when namespace, and only create the kinds listed below.
+#
+# Sources:
+# https://argo-cd.readthedocs.io/en/stable/user-guide/projects/
+# https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#projects
+
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: lab-app
+  namespace: argocd
+  annotations:
+    # Projects exist before any Application that uses them (Fall #0 fix).
+    argocd.argoproj.io/sync-wave: "-10"
+  labels:
+    environment: lab
+    category: app
+
+spec:
+  description: Say When cleanup app - deployed only from Git, only into say-when
+
+  sourceRepos:
+    - https://github.com/earpjennings37/say_when_git_ops.git
+
+  destinations:
+    - namespace: say-when
+      server: https://kubernetes.default.svc
+
+  # Cluster-wide: only the app's own Namespace (so its labels live in Git).
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
+
+  # Inside say-when: just what a web app needs. No Secrets, no RBAC.
+  namespaceResourceWhitelist:
+    - group: ""
+      kind: ConfigMap
+
+    - group: ""
+      kind: Service
+
+    - group: ""
+      kind: ServiceAccount
+
+    - group: apps
+      kind: Deployment
+
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+
+  # Flag anything in say-when that isn't in Git (kubectl hand-edits).
+  orphanedResources:
+    warn: true

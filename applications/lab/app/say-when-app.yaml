@@ -1,0 +1,45 @@
+---
+# Purpose:
+# Keep the say-when namespace matching apps/say-when-app in Git.
+# A chore change or a new image tag is a PR; Argo CD does the rest.
+#
+# Sources:
+# https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#applications
+# https://argo-cd.readthedocs.io/en/stable/user-guide/auto_sync/
+# https://argo-cd.readthedocs.io/en/stable/user-guide/sync-waves/
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: say-when-app
+  namespace: argocd
+  annotations:
+    # Envoy Gateway is wave -1 and the platform Gateway is wave 0,
+    # so the app's HTTPRoute has something to attach to.
+    argocd.argoproj.io/sync-wave: "1"
+  labels:
+    environment: lab
+    category: app
+
+spec:
+  project: lab-app
+
+  source:
+    repoURL: https://github.com/earpjennings37/say_when_git_ops.git
+    targetRevision: main
+    path: apps/say-when-app
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: say-when
+
+  syncPolicy:
+    automated:
+      prune: true      # deleted from Git = deleted from the cluster
+      selfHeal: true   # hand edits get reverted to what Git says
+
+    syncOptions:
+      - ServerSideApply=true
+
+  # Keep the last 5 syncs for rollback/history in the UI.
+  revisionHistoryLimit: 5

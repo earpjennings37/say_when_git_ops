@@ -1,0 +1,117 @@
+---
+# Purpose:
+# Run the signed say-when-app image from ECR (built and signed by
+# say_when_app CI). Chores come from the ConfigMap, so a chore change is
+# a Git PR, not a new image.
+#
+# Sources:
+# https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+# https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+# https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+# https://kubernetes.io/docs/concepts/configuration/configmap/#configmaps-and-pods
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: say-when-app
+  namespace: say-when
+  labels:
+    app.kubernetes.io/name: say-when-app
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: say-when
+
+spec:
+  replicas: 2
+  revisionHistoryLimit: 3
+
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: say-when-app
+
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: say-when-app
+        app.kubernetes.io/component: api
+        app.kubernetes.io/part-of: say-when
+
+    spec:
+      serviceAccountName: say-when-app
+      automountServiceAccountToken: false
+
+      # The image is built for ARM64 only (Graviton nodes).
+      nodeSelector:
+        kubernetes.io/arch: arm64
+
+      # Prefer the two replicas on different nodes (Spot can vanish).
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: say-when-app
+
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001      # matches USER 10001 in the Dockerfile
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+
+      containers:
+        - name: app
+          # Tag = the say_when_app commit CI built and signed.
+          # A new release is a one-line PR changing this tag.
+          image: 026090519635.dkr.ecr.us-east-1.amazonaws.com/say-when-app:64025c4d4bb0d0ced62593cae2067f8fb202c2de
+          imagePullPolicy: IfNotPresent
+
+          env:
+            - name: CHORES_FILE
+              value: /etc/say-when/chores.yaml
+
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 5
+            failureThreshold: 3
+
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 3
+
+          resources:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 192Mi
+
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            privileged: false
+            capabilities:
+              drop:
+                - ALL
+
+          volumeMounts:
+            - name: chores
+              mountPath: /etc/say-when
+              readOnly: true
+
+      volumes:
+        - name: chores
+          configMap:
+            name: say-when-chores

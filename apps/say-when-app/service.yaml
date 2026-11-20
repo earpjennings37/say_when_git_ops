@@ -1,0 +1,26 @@
+---
+# Purpose:
+# Stable in-cluster address for the app pods. Envoy Gateway's HTTPRoute
+# (Part C) sends traffic here. ClusterIP only: nothing public yet.
+#
+# Source:
+# https://kubernetes.io/docs/concepts/services-networking/service/
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: say-when-app
+  namespace: say-when
+  labels:
+    app.kubernetes.io/name: say-when-app
+    app.kubernetes.io/part-of: say-when
+
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: say-when-app
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP
