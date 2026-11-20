@@ -58,7 +58,7 @@ data:
         name: Last mow of the season
         expect: [Lawn Mower, Lawn, Grass]
         reject: [Football, American Football]
-        min_confidence: 80
+        min_confidence: 85
 kind: ConfigMap
 metadata:
   name: say-when-chores
