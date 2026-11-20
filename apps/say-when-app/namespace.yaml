@@ -1,0 +1,22 @@
+---
+# Purpose:
+# The app's namespace, with the Kubernetes "restricted" Pod Security
+# Standard ENFORCED: pods that run as root, keep capabilities or allow
+# privilege escalation are rejected at admission.
+#
+# Sources:
+# https://kubernetes.io/docs/concepts/security/pod-security-standards/
+# https://kubernetes.io/docs/concepts/security/pod-security-admission/
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: say-when
+  labels:
+    app.kubernetes.io/part-of: say-when
+    app.kubernetes.io/managed-by: argocd
+    environment: lab
+
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/warn: restricted

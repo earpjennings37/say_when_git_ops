@@ -1,0 +1,53 @@
+---
+# Purpose:
+# Attach the app to the platform's say-when Gateway and choose which
+# paths are reachable from outside the cluster. /metrics is deliberately
+# NOT routed: Prometheus scrapes the Service directly (Fall #7), so the
+# public front door never exposes internal counters.
+#
+# Sources:
+# https://gateway-api.sigs.k8s.io/api-types/httproute/
+# https://gateway-api.sigs.k8s.io/guides/http-routing/
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: say-when-app
+  namespace: say-when
+  labels:
+    app.kubernetes.io/name: say-when-app
+    app.kubernetes.io/component: route
+    app.kubernetes.io/part-of: say-when
+
+spec:
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: say-when
+      namespace: envoy-gateway-system
+      sectionName: http
+
+  hostnames:
+    - cleanup.local
+
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /chores
+        - path:
+            type: Exact
+            value: /version
+        - path:
+            type: Exact
+            value: /healthz
+        - path:
+            type: Exact
+            value: /docs
+        - path:
+            type: Exact
+            value: /openapi.json
+      backendRefs:
+        - kind: Service
+          name: say-when-app
+          port: 8080

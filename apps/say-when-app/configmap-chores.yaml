@@ -1,0 +1,65 @@
+apiVersion: v1
+data:
+  chores.yaml: |-
+    # Fall Cleaning chores and the rules for judging their photos.
+    # Changing a chore or its rules is a pull request, not a code change.
+    #
+    #   expect:  Rekognition labels that count as proof (any one is enough)
+    #   reject:  labels that mean "that's not the chore" (any one fails it)
+    #   min_confidence: lowest Rekognition confidence (0-100) that counts
+    season: fall
+    chores:
+      - id: rake-leaves
+        name: Rake leaves
+        expect: [Rake, Leaf]
+        reject: [Basketball, Sports Ball]
+        min_confidence: 80
+      - id: bag-leaves
+        name: Bag leaves
+        expect: [Bag, Leaf, Garbage Bag]
+        reject: [Basketball]
+        min_confidence: 75
+      - id: trim-trees
+        name: Trim trees and bushes
+        expect: [Shears, Saw, Branch, Pruning]
+        reject: [Cup, Mug]
+        min_confidence: 75
+      - id: put-away-hoses
+        name: Put away garden hoses
+        expect: [Hose, Garden Hose]
+        reject: [Bicycle]
+        min_confidence: 75
+      - id: take-down-gazebo
+        name: Take down the gazebo
+        expect: [Gazebo, Tent, Canopy]
+        reject: [Television]
+        min_confidence: 70
+      - id: store-deck-furniture
+        name: Store deck furniture
+        expect: [Chair, Furniture, Patio]
+        reject: [Dog]
+        min_confidence: 75
+      - id: cover-grill
+        name: Cover the grill
+        expect: [Grill, Bbq, Tarp]
+        reject: [Car]
+        min_confidence: 70
+      - id: cover-ac-unit
+        name: Cover the AC unit
+        expect: [Air Conditioner, Tarp]
+        reject: [Door]
+        min_confidence: 70
+      - id: clear-flower-beds
+        name: Clear flower beds
+        expect: [Trowel, Soil, Garden]
+        reject: [Shoe, Footwear]
+        min_confidence: 75
+      - id: last-mow
+        name: Last mow of the season
+        expect: [Lawn Mower, Lawn, Grass]
+        reject: [Football, American Football]
+        min_confidence: 80
+kind: ConfigMap
+metadata:
+  name: say-when-chores
+  namespace: say-when

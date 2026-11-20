@@ -1,0 +1,78 @@
+---
+# Purpose:
+# Platform-owned front door for the Say When app. The platform owns the
+# listener and hostname; the app only attaches an HTTPRoute from its own
+# namespace. ClusterIP for now (no AWS load balancer, no cost); Fall #4
+# switches this EnvoyProxy to an NLB and adds HTTPS.
+#
+# Sources:
+# https://gateway-api.sigs.k8s.io/api-types/gateway/
+# https://gateway-api.sigs.k8s.io/guides/multiple-ns/
+# https://gateway.envoyproxy.io/docs/tasks/operations/customize-envoyproxy/
+
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+metadata:
+  name: say-when-proxy
+  namespace: envoy-gateway-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+
+spec:
+  provider:
+    type: Kubernetes
+    kubernetes:
+      envoyService:
+        type: ClusterIP
+      envoyDeployment:
+        replicas: 1
+        container:
+          resources:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: say-when
+  namespace: envoy-gateway-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+  labels:
+    app.kubernetes.io/name: say-when-gateway
+    app.kubernetes.io/component: gateway
+    app.kubernetes.io/part-of: say-when
+    app.kubernetes.io/managed-by: argocd
+
+spec:
+  gatewayClassName: envoy
+
+  infrastructure:
+    parametersRef:
+      group: gateway.envoyproxy.io
+      kind: EnvoyProxy
+      name: say-when-proxy
+
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      hostname: cleanup.local
+
+      # Only HTTPRoutes from the say-when namespace may attach.
+      # kubernetes.io/metadata.name is set by Kubernetes on every
+      # namespace and can't be faked by another namespace.
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: say-when
+        kinds:
+          - group: gateway.networking.k8s.io
+            kind: HTTPRoute
