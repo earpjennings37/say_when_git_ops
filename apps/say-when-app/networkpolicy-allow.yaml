@@ -1,0 +1,65 @@
+---
+# Purpose:
+# The only traffic say-when allows:
+#   1. Envoy proxy pods for the say-when Gateway -> app on 8080
+#   2. All say-when pods -> cluster DNS (CoreDNS) on 53
+# Prometheus scraping is added in Fall #7.
+#
+# Sources:
+# https://kubernetes.io/docs/concepts/services-networking/network-policies/
+# https://gateway.envoyproxy.io/docs/
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress-from-envoy
+  namespace: say-when
+  labels:
+    app.kubernetes.io/part-of: say-when
+
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: say-when-app
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        # Both selectors in ONE item = AND: Envoy pods of the say-when
+        # Gateway, in envoy-gateway-system. Nothing else.
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: envoy-gateway-system
+          podSelector:
+            matchLabels:
+              gateway.envoyproxy.io/owning-gateway-name: say-when
+      ports:
+        - protocol: TCP
+          port: 8080
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-egress-dns
+  namespace: say-when
+  labels:
+    app.kubernetes.io/part-of: say-when
+
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
