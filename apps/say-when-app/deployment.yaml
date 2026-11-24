@@ -1,14 +1,14 @@
 ---
 # Purpose:
 # Run the signed say-when-app image from ECR (built and signed by
-# say_when_app CI). Chores come from the ConfigMap, so a chore change is
-# a Git PR, not a new image.
+# say_when_app CI). Chores come from a ConfigMap and the admin token
+# from a Secret synced by External Secrets, both mounted as files that
+# the app re-reads on every request (live updates, no restart).
 #
 # Sources:
 # https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
 # https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
-# https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-# https://kubernetes.io/docs/concepts/configuration/configmap/#configmaps-and-pods
+# https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-files-from-a-pod
 
 apiVersion: apps/v1
 kind: Deployment
@@ -39,11 +39,9 @@ spec:
       serviceAccountName: say-when-app
       automountServiceAccountToken: false
 
-      # The image is built for ARM64 only (Graviton nodes).
       nodeSelector:
         kubernetes.io/arch: arm64
 
-      # Prefer the two replicas on different nodes (Spot can vanish).
       topologySpreadConstraints:
         - maxSkew: 1
           topologyKey: kubernetes.io/hostname
@@ -54,21 +52,23 @@ spec:
 
       securityContext:
         runAsNonRoot: true
-        runAsUser: 10001      # matches USER 10001 in the Dockerfile
+        runAsUser: 10001
         runAsGroup: 10001
+        fsGroup: 10001          # NEW: mounted Secret files owned by group 10001
         seccompProfile:
           type: RuntimeDefault
 
       containers:
         - name: app
-          # Tag = the say_when_app commit CI built and signed.
-          # A new release is a one-line PR changing this tag.
-          image: 026090519635.dkr.ecr.us-east-1.amazonaws.com/say-when-app:64025c4d4bb0d0ced62593cae2067f8fb202c2de
+          # NEW tag: Fall #3 build with /admin/status (say_when_app ce7d608).
+          image: 026090519635.dkr.ecr.us-east-1.amazonaws.com/say-when-app:ce7d608c0ed0b24be0f9246f71cc08b53678d760
           imagePullPolicy: IfNotPresent
 
           env:
             - name: CHORES_FILE
               value: /etc/say-when/chores.yaml
+            - name: ADMIN_TOKEN_FILE                      # NEW
+              value: /etc/say-when/secrets/admin_token
 
           ports:
             - name: http
@@ -110,8 +110,18 @@ spec:
             - name: chores
               mountPath: /etc/say-when
               readOnly: true
+            - name: app-settings                          # NEW
+              mountPath: /etc/say-when/secrets
+              readOnly: true
 
       volumes:
         - name: chores
           configMap:
             name: say-when-chores
+        - name: app-settings                              # NEW
+          secret:
+            secretName: say-when-app-settings
+            defaultMode: 0440   # owner + group read only; group = fsGroup 10001
+            items:
+              - key: admin_token
+                path: admin_token

@@ -51,6 +51,17 @@ spec:
 
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
+    
+    # Fall #3: secrets arrive through External Secrets, never as raw Secrets.
+    - group: external-secrets.io
+      kind: SecretStore
+
+    - group: external-secrets.io
+      kind: ExternalSecret
+
+    # Fall #3: default-deny networking for the app.
+    - group: networking.k8s.io
+      kind: NetworkPolicy
 
   # Flag anything in say-when that isn't in Git (kubectl hand-edits).
   orphanedResources:

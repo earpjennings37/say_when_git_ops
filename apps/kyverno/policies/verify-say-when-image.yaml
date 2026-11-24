@@ -1,0 +1,70 @@
+---
+# Purpose:
+# Every container image in say-when must carry a Cosign keyless
+# signature from the say_when_app build workflow on main. This is the
+# same check as `cosign verify` in Fall #1, run at admission.
+#
+# Rollout: Audit first (results land in PolicyReports, nothing is
+# blocked; failurePolicy Ignore so a verifier error can't stall the
+# app). After the real image is shown passing, flip to Deny + Fail.
+#
+# Registry auth: providers: [amazon] uses Kyverno's EKS Pod Identity
+# role (say_when_infra kyverno-ecr.tf), read-only on say-when-app.
+#
+# Sources:
+# https://kyverno.io/docs/policy-types/image-validating-policy/
+# https://docs.sigstore.dev/cosign/verifying/verify/
+
+apiVersion: policies.kyverno.io/v1
+kind: ImageValidatingPolicy
+metadata:
+  name: verify-say-when-image
+  annotations:
+    policies.kyverno.io/title: Verify Say When Images
+    policies.kyverno.io/category: Supply Chain Security
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/subject: Pod
+
+spec:
+  validationActions:
+    - Audit
+  failurePolicy: Ignore
+
+  webhookConfiguration:
+    timeoutSeconds: 15
+
+  matchConstraints:
+    namespaceSelector:
+      matchLabels:
+        kubernetes.io/metadata.name: say-when
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+
+  # Every image in say-when, not just ours: an unsigned public image
+  # must fail too.
+  matchImageReferences:
+    - glob: "*"
+
+  credentials:
+    providers:
+      - amazon
+
+  attestors:
+    - name: ci
+      cosign:
+        keyless:
+          identities:
+            - issuer: https://token.actions.githubusercontent.com
+              subject: https://github.com/earpjennings37/say_when_app/.github/workflows/build.yaml@refs/heads/main
+        ctlog:
+          url: https://rekor.sigstore.dev
+
+  validations:
+    - expression: >-
+        images.containers.all(img, verifyImageSignatures(img, [attestors.ci]) > 0)
+      message: >-
+        Images in say-when must be signed by the say_when_app build
+        workflow on main.
