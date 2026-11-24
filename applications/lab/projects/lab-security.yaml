@@ -94,7 +94,7 @@ spec:
 
     - group: policies.kyverno.io
       kind: ValidatingPolicy
-  
+
     - group: policies.kyverno.io
       kind: ImageValidatingPolicy
 

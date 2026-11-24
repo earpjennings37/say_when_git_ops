@@ -51,7 +51,7 @@ spec:
 
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
-    
+
     # Fall #3: secrets arrive through External Secrets, never as raw Secrets.
     - group: external-secrets.io
       kind: SecretStore
