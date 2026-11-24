@@ -27,8 +27,8 @@ metadata:
 
 spec:
   validationActions:
-    - Audit
-  failurePolicy: Ignore
+    - Deny
+  failurePolicy: Fail
 
   webhookConfiguration:
     timeoutSeconds: 15
