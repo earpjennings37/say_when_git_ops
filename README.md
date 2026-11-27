@@ -1,6 +1,6 @@
 # Say When: EKS GitOps Platform 🤠
 
-The GitOps half of my AWS EKS DevSecOps home lab. Argo CD watches this repo and makes the cluster match it: security tooling, observability, autoscaling, ingress, progressive delivery, AI ops and demo workloads.
+The GitOps half of my AWS EKS DevSecOps home lab. Argo CD watches this repo and makes the cluster match it: security tooling, observability, autoscaling, ingress, progressive delivery, AI ops, demo workloads and the **Say When** chore app ([say_when_app](https://github.com/earpjennings37/say_when_app)).
 
 | | |
 | --- | --- |
@@ -24,7 +24,7 @@ flowchart TD
     TF["say_when_infra (Terraform)"] -->|installs| Argo["Argo CD"]
     TF -->|applies| BR["bootstrap-root"]
     BR -->|bootstrap/| MR["monitoring-root<br/>(app of apps)"]
-    MR -->|applications/lab/**| Proj["AppProjects<br/>lab-platform, lab-security,<br/>lab-observability, lab-ai-ops,<br/>lab-workloads"]
+    MR -->|applications/lab/**| Proj["AppProjects<br/>lab-platform, lab-security,<br/>lab-observability, lab-ai-ops,<br/>lab-workloads, lab-app"]
     MR --> Apps["Applications<br/>(Helm charts + apps/ manifests)"]
     MR --> AS["ApplicationSet<br/>lab-security-manifests"]
     AS --> Gen["kube-bench, kyverno-policies,<br/>network-policies, popeye"]
@@ -49,8 +49,8 @@ flowchart TD
 | | | Argo Rollouts | `argo-rollouts` | 2.43.11 |
 | | | Metrics Server | `metrics-server` | 3.12.0 |
 | | `default` | gp3 `StorageClass`, `monitoring` namespace | `applications/lab/platform` | |
-| Security | `lab-security` | Kyverno + 8 CEL policies | `kyverno` | 3.9.1 |
-| | | Falco | `falco` | 9.1.0 |
+| Security | `lab-security` | Kyverno + 8 CEL policies + 1 image-signature policy | `kyverno` | 3.9.1 |
+| | | Falco | `falco` | 9.2.2 |
 | | | Trivy Operator | `trivy-operator` | 0.35.0 |
 | | | External Secrets Operator | `external-secrets` | 2.12.0 |
 | | | kube-bench, Popeye, network policies | ApplicationSet → `apps/` | |
@@ -63,6 +63,7 @@ flowchart TD
 | | | `gateway-demo` (whoami behind an `HTTPRoute`) | `apps/gateway-demo` | |
 | | | `rollouts-demo` (canary) | `apps/rollouts-demo` | |
 | | | `rollouts-bluegreen` (blue-green, manual promotion) | `apps/rollouts-bluegreen` | |
+| App | `lab-app` | `say-when-app` (FastAPI chore app) + its `HTTPRoute`, `SecretStore`/`ExternalSecret` and network policies | `apps/say-when-app` | image pinned by commit SHA |
 
 Only `bootstrap-root` and `monitoring-root` (plus the two cluster-foundation manifests) should live in the `default` project. Everything else goes in a `lab-*` AppProject that limits which repos, namespaces and resource kinds it can touch.
 
@@ -75,11 +76,11 @@ Applications use `argocd.argoproj.io/sync-wave` so dependencies come up first:
 | `-2` | `karpenter-crd`, `envoy-gateway` (CRDs) |
 | `-1` | `karpenter`, `argo-rollouts` |
 | `0` | `karpenter-config`, `envoy-gateway-config`, `external-secrets`, `kyverno`, `k8sgpt-operator` |
-| `1` | `external-secrets-config`, `gateway-demo`, `rollouts-bluegreen`, `k8sgpt` |
+| `1` | `external-secrets-config`, `gateway-demo`, `rollouts-bluegreen`, `k8sgpt`, `say-when-app` |
 | `2` | `secret-demo` |
 | none (0) | `rollouts-demo` and everything else |
 
-> ℹ️ Waves currently control the **order** Applications start in, not whether the previous wave is healthy. To make Argo CD wait on child Application health, add a health check for `argoproj.io/Application` to the Argo CD values in `say_when_infra`. That isn't set up yet.
+> ℹ️ The Argo CD values in `say_when_infra` include a health check for `argoproj.io/Application`, so a wave waits until the Applications in the wave before it are healthy, not just created.
 
 ## Repository structure
 
@@ -92,13 +93,16 @@ Applications use `argocd.argoproj.io/sync-wave` so dependencies come up first:
 │   ├── security/                  #   Kyverno, Falco, Trivy, ESO + the security ApplicationSet
 │   ├── observability/             #   Prometheus/Grafana, Thanos, Loki, Tempo
 │   ├── ai-ops/                    #   K8sGPT operator + K8sGPT resource
-│   └── workloads/                 #   Demo apps
+│   ├── workloads/                 #   Demo apps
+│   └── app/                       #   say-when-app
 ├── apps/                          # Helm values + raw manifests: how it's configured
 │   ├── <chart>/values.yaml
-│   ├── kyverno/policies/          #   8 CEL policies
+│   ├── kyverno/policies/          #   8 CEL policies + verify-say-when-image
 │   ├── network-policies/          #   default-deny + allow rules for monitoring
+│   ├── say-when-app/              #   Deployment, Service, HTTPRoute, chores ConfigMap,
+│   │                              #   SecretStore/ExternalSecret, network policies
 │   ├── karpenter-config/          #   EC2NodeClass + NodePool
-│   ├── envoy-gateway-config/      #   GatewayClass, Gateway, EnvoyProxy
+│   ├── envoy-gateway-config/      #   GatewayClass, Gateways (incl. say-when), EnvoyProxy
 │   ├── rollouts-demo/  rollouts-bluegreen/  gateway-demo/  secret-demo/
 │   └── kube-bench/  popeye/  k8sgpt/  external-secrets-config/
 ├── docs/kubectl-ai/               # Example local kubectl-ai config (no credentials)
@@ -118,10 +122,25 @@ A few settings here point at AWS resources that `say_when_infra` creates. If you
 | `apps/k8sgpt/k8sgpt.yaml` `serviceAccountIRSA` role ARN | K8sGPT IRSA role | `k8sgpt-iam.tf` |
 | `apps/popeye/cronjob.yaml` image | Popeye ECR repo | `ecr-popeye.tf` |
 | `apps/external-secrets-config/external-secret.yaml` key `say-when/demo-app/credentials` | Secrets Manager secret | `external-secrets.tf` |
+| `apps/say-when-app/externalsecret.yaml` key `say-when/app/settings`, property `admin_token` | App settings secret | `app-secrets.tf` |
+| `apps/say-when-app/deployment.yaml` image `…/say-when-app:<sha>` | say-when-app ECR repo | `bootstrap/github-actions` |
+| `apps/kyverno/policies/verify-say-when-image.yaml` `providers: [amazon]` | Kyverno ECR read role (Pod Identity) | `kyverno-ecr.tf` |
 
 The Thanos `objstore` Secret holds only the bucket name and region. Access comes from IRSA, not keys.
 
 ## Highlights
+
+### Say When app
+```mermaid
+flowchart LR
+    User["cleanup.local"] --> GW["Envoy Gateway<br/>say-when Gateway"] --> Route["HTTPRoute<br/>/chores, /version, /healthz, /docs"] --> App["say-when-app<br/>(say-when namespace)"]
+    SM["Secrets Manager<br/>say-when/app/settings"] --> ESO["External Secrets"] --> Secret["say-when-app-settings"] -->|mounted file| App
+```
+- **Own AppProject (`lab-app`):** this repo only, the `say-when` namespace only, and a short allowlist of kinds (Deployment, Service, ConfigMap, HTTPRoute, SecretStore, ExternalSecret, NetworkPolicy).
+- **Own Gateway:** the `say-when` Gateway only accepts `HTTPRoute`s from the `say-when` namespace. `/metrics` and `/admin/status` are deliberately **not** routed.
+- **Admin token:** synced from Secrets Manager every minute and mounted read-only at `/etc/say-when/secrets/admin_token`. The app rereads it on each request, so rotation needs no restart.
+- **Signed images only:** see `verify-say-when-image` below.
+- **Default-deny network:** see network policies below.
 
 ### External Secrets
 ```mermaid
@@ -141,11 +160,16 @@ Terraform owns the AWS secret, IAM role and Pod Identity association. Argo CD ow
 | Require requests and limits | Audit |
 | Require non-root | Audit |
 | Require dropping all capabilities | Audit |
+| `verify-say-when-image`: every image in `say-when` must have a Cosign keyless signature from the `say_when_app` build workflow on `main` | **Deny** (`failurePolicy: Fail`) |
 
-New policies start in Audit until I'm sure they won't break something, then move to Deny.
+New policies start in Audit until I'm sure they won't break something, then move to Deny. `verify-say-when-image` went through that in Fall #3: Audit with `failurePolicy: Ignore` first, then Deny + Fail once the real image passed.
+
+`verify-say-when-image` is an `ImageValidatingPolicy`. It matches every image (`glob: "*"`), so an unsigned public image is rejected too. Kyverno pulls signatures from ECR with its own Pod Identity role (`kyverno-ecr.tf` in `say_when_infra`), read-only on the one repo.
 
 ### Network policies
-The `monitoring` namespace is **default-deny**. Only these paths are open: Grafana → Prometheus, Loki and Tempo; Prometheus internal scrapes, kube-state-metrics and node-exporter; Thanos Query → sidecar and store gateway; Loki internal; DNS; and the Kubernetes API where needed. Enforcement comes from the VPC CNI's network policy support, which Terraform turns on.
+The `say-when` namespace is **default-deny** for ingress and egress. Only two paths are open: the say-when Gateway's Envoy pods → the app on 8080, and every pod → CoreDNS on 53. Prometheus scraping gets added later (Fall #7).
+
+The `monitoring` namespace is also **default-deny**. Only these paths are open: Grafana → Prometheus, Loki and Tempo; Prometheus internal scrapes, kube-state-metrics and node-exporter; Thanos Query → sidecar and store gateway; Loki internal; DNS; and the Kubernetes API where needed. Enforcement comes from the VPC CNI's network policy support, which Terraform turns on.
 
 ### Karpenter
 One `NodePool` (`lab-arm64-spot`): ARM64 Spot only, `t`/`c`/`m` families, generation 4 and newer, 2–4 vCPU instances, capped at 8 vCPU / 32 GiB total, and it consolidates empty or underused nodes after 5 minutes. Nodes use a pinned AL2023 AMI (`al2023@v20261012`) with IMDSv2 required and encrypted gp3 root volumes.
@@ -194,6 +218,12 @@ kubectl get nodepools,ec2nodeclasses,nodeclaims
 
 # External Secrets
 kubectl get secretstore,externalsecret -n secret-demo
+kubectl get secretstore,externalsecret -n say-when
+
+# Say When app: pods, route, network policies, signature policy results
+kubectl get pods,httproute,networkpolicy -n say-when
+kubectl get imagevalidatingpolicy verify-say-when-image
+kubectl get policyreports -n say-when
 
 # Gateway API
 kubectl get gatewayclass,gateway -A && kubectl get httproute -A
